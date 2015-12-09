@@ -1,0 +1,30 @@
+{
+  "name": "getdocs",
+  "version": "0.0.1",
+  "description": "Getdocs is not JSDoc",
+  "main": "src/index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/marijnh/getdocs.git"
+  },
+  "keywords": [
+    "documentation",
+    "comment"
+  ],
+  "maintainers": [
+    {
+      "name": "Marijn Haverbeke",
+      "email": "marijnh@gmail.com",
+      "web": "http://marijnhaverbeke.nl"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marijnh/getdocs/issues"
+  },
+  "dependencies": {
+    "acorn": "^2.6.4",
+    "glob": "^6.0.1"
+  }
+}
