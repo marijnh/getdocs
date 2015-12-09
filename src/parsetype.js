@@ -58,13 +58,13 @@ function parse(input) {
     var type = {type: "function", params: []}
     while (!input.eat(")")) {
       if (type.params.length && !input.eat(",")) input.error("Missing comma")
-      var obj = {}
-      if (input.match(/^\.\.\./)) obj.rest = true
-      var name = input.match(/^([\w$]+)(\??)\s*:/), obj = {}
-      type.params.push(obj)
-      if (name) obj.name = name[1]
-      obj.type = parse(input)
-      if (name && name[2]) obj.type.optional = true
+      var rest = input.match(/^\.\.\./)
+      var name = input.match(/^([\w$]+)(\??)\s*:/)
+      var param = parse(input)
+      if (rest) param.rest = true
+      if (name) param.paramName = name[1]
+      if (name && name[2]) param.optional = true
+      type.params.push(param)
     }
     if (input.match(/→|->/))
       type.returns = parse(input)

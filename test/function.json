@@ -3,18 +3,14 @@
     "type": "function",
     "params": [
       {
-        "type": {
-          "type": "ident",
-          "name": "number"
-        },
-        "name": "a"
+        "type": "ident",
+        "name": "number",
+        "paramName": "a"
       },
       {
-        "type": {
-          "type": "ident",
-          "name": "number"
-        },
-        "name": "b"
+        "type": "ident",
+        "name": "number",
+        "paramName": "b"
       }
     ],
     "returns": {

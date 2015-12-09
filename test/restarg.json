@@ -3,15 +3,13 @@
     "type": "function",
     "params": [
       {
-        "type": {
-          "type": "array",
-          "content": {
-            "type": "ident",
-            "name": "string"
-          }
+        "type": "array",
+        "content": {
+          "type": "ident",
+          "name": "string"
         },
         "rest": true,
-        "name": "stuff"
+        "paramName": "stuff"
       }
     ],
     "returns": {

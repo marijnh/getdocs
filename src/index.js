@@ -111,7 +111,7 @@ function add(items, name, data) {
 }
 
 function inferParam(n) {
-  var param = {type: {type: "any"}}
+  var param = {type: "any"}
   if (n.type == "RestElement") {
     param.rest = true
     n = n.argument
@@ -122,7 +122,7 @@ function inferParam(n) {
     n = n.left
     param.optional = true
   }
-  if (n.type == "Identifier") param.name = n.name
+  if (n.type == "Identifier") param.paramName = n.name
   return param
 }
 

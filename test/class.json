@@ -12,18 +12,14 @@
         "type": "function",
         "params": [
           {
-            "type": {
-              "type": "ident",
-              "name": "number"
-            },
-            "name": "a"
+            "type": "ident",
+            "name": "number",
+            "paramName": "a"
           },
           {
-            "type": {
-              "type": "ident",
-              "name": "string"
-            },
-            "name": "b"
+            "type": "ident",
+            "name": "string",
+            "paramName": "b"
           }
         ],
         "returns": {
@@ -44,16 +40,12 @@
       "type": "function",
       "params": [
         {
-          "type": {
-            "type": "any"
-          },
-          "name": "a"
+          "type": "any",
+          "paramName": "a"
         },
         {
-          "type": {
-            "type": "any"
-          },
-          "name": "b"
+          "type": "any",
+          "paramName": "b"
         }
       ]
     }
