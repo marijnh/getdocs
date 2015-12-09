@@ -11,7 +11,7 @@ function onOwnLine(text, pos) {
   return true;
 }
 
-module.exports = function commentsBefore(text, pos) {
+module.exports = function(text, pos) {
   var found = [], emptyLines = 0, topIsLineComment;
   out: while (pos > 0) {
     var prev = text.charCodeAt(pos - 1);

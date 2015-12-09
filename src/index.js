@@ -69,7 +69,7 @@ function getDescription(comments, remove) {
 }
 
 function get(node) {
-  var comments = commentsBefore(node.loc.source.text, node.start), m
+  var comments = commentsBefore(node.loc.source.text, node.start)
   for (var i = comments.length - 1; i >= 0; i--) {
     var decl = /^\s*(:[-:])/.exec(comments[i])
     if (!decl) continue
