@@ -12,19 +12,16 @@
         "type": "function",
         "params": [
           {
-            "type": "ident",
-            "name": "number",
-            "paramName": "a"
+            "type": "number",
+            "name": "a"
           },
           {
-            "type": "ident",
-            "name": "string",
-            "paramName": "b"
+            "type": "string",
+            "name": "b"
           }
         ],
         "returns": {
-          "type": "ident",
-          "name": "bool"
+          "type": "bool"
         },
         "file": "test/class.js",
         "loc": {
@@ -41,11 +38,11 @@
       "params": [
         {
           "type": "any",
-          "paramName": "a"
+          "name": "a"
         },
         {
           "type": "any",
-          "paramName": "b"
+          "name": "b"
         }
       ]
     }

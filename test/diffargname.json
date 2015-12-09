@@ -3,14 +3,12 @@
     "type": "function",
     "params": [
       {
-        "paramName": "foo",
-        "type": "ident",
-        "name": "number"
+        "name": "foo",
+        "type": "number"
       },
       {
-        "paramName": "bar",
-        "type": "ident",
-        "name": "string"
+        "name": "bar",
+        "type": "string"
       }
     ],
     "file": "test/diffargname.js",

@@ -3,19 +3,16 @@
     "type": "function",
     "params": [
       {
-        "type": "ident",
-        "name": "number",
-        "paramName": "a"
+        "type": "number",
+        "name": "a"
       },
       {
-        "type": "ident",
-        "name": "number",
-        "paramName": "b"
+        "type": "number",
+        "name": "b"
       }
     ],
     "returns": {
-      "type": "ident",
-      "name": "number"
+      "type": "number"
     },
     "description": "Adds two numbers",
     "file": "test/function.js",

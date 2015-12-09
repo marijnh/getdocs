@@ -3,11 +3,10 @@
     "type": "function",
     "params": [
       {
-        "type": "ident",
-        "name": "bool",
+        "type": "bool",
         "default": "false",
         "optional": true,
-        "paramName": "arg"
+        "name": "arg"
       }
     ],
     "file": "test/defaultarg.js",

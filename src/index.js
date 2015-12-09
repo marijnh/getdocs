@@ -122,7 +122,7 @@ function inferParam(n) {
     n = n.left
     param.optional = true
   }
-  if (n.type == "Identifier") param.paramName = n.name
+  if (n.type == "Identifier") param.name = n.name
   return param
 }
 

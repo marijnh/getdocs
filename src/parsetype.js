@@ -62,7 +62,7 @@ function parse(input) {
       var name = input.match(/^([\w$]+)(\??)\s*:/)
       var param = parse(input)
       if (rest) param.rest = true
-      if (name) param.paramName = name[1]
+      if (name) param.name = name[1]
       if (name && name[2]) param.optional = true
       type.params.push(param)
     }
@@ -85,7 +85,7 @@ function parse(input) {
   } else {
     var name = input.match(/^[\w$]+(?:\.[\w$]+)*/)
     if (!name) input.error("Unexpected syntax: " + input.str.slice(input.pos, input.pos + 5))
-    var type = {type: "ident", name: name[0]}
+    var type = {type: name[0]}
     if (input.eat("<")) {
       type.content = parse(input)
       if (!input.eat(">")) input.error("Missing >")

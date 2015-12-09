@@ -5,16 +5,14 @@
       {
         "type": "array",
         "content": {
-          "type": "ident",
-          "name": "string"
+          "type": "string"
         },
         "rest": true,
-        "paramName": "stuff"
+        "name": "stuff"
       }
     ],
     "returns": {
-      "type": "ident",
-      "name": "bool"
+      "type": "bool"
     },
     "file": "test/restarg.js",
     "loc": {

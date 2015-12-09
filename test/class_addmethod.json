@@ -12,19 +12,16 @@
         "type": "function",
         "params": [
           {
-            "type": "ident",
-            "name": "number",
-            "paramName": "a"
+            "type": "number",
+            "name": "a"
           },
           {
-            "type": "ident",
-            "name": "string",
-            "paramName": "b"
+            "type": "string",
+            "name": "b"
           }
         ],
         "returns": {
-          "type": "ident",
-          "name": "bool"
+          "type": "bool"
         },
         "description": "A method",
         "file": "test/class_addmethod.js",
