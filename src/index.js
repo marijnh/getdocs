@@ -7,7 +7,13 @@ var parseType = require("./parsetype")
 
 exports.gather = function(text, filename, items) {
   if (!items) items = {}
-  var ast = acorn.parse(text, {ecmaVersion: 6, locations: true, sourceFile: {text: text, name: filename}})
+  var ast = acorn.parse(text, {
+    ecmaVersion: 6,
+    locations: true,
+    sourceFile: {text: text, name: filename},
+    sourceType: "module"
+  })
+
   walk.simple(ast, {
     VariableDeclaration: function(node) {
       var above = get(node), decl0 = node.declarations[0]

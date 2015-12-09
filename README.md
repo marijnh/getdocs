@@ -17,33 +17,35 @@ export function plus(a, b = 2) {
 You can say `getdocs foo.js` to get this JSON:
 
 ```json
-[
-  {
-    "name": "plus",
-    "kind": "function",
-    "location": {
-      "file": "foo.js",
-      "line": 3,
-      "column": 0
+{
+  "plus": {
+    "type": "function",
+    "params": [
+      {
+        "type": {
+          "type": "ident",
+          "name": "number"
+        },
+        "name": "a"
+      },
+      {
+        "type": {
+          "type": "ident",
+          "name": "number"
+        },
+        "default": "2",
+        "optional": true,
+        "name": "b"
+      }
+    ],
+    "returns": {
+      "type": "ident",
+      "name": "number"
     },
     "description": "Add two numbers",
-    "type": {
-      "type": "function",
-      "arguments": [
-        {
-          "name": "a",
-          "type: "number"
-        },
-        {
-          "name": "b",
-          "type": "number",
-          "optional": true,
-          "default": "2"
-        }
-      ]
-    }
+    "kind": "function"
   }
-]
+}
 ```
 
 The idea is to then feed this into a system that massages it into
