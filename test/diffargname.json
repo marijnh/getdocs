@@ -1,0 +1,27 @@
+{
+  "x": {
+    "type": "function",
+    "params": [
+      {
+        "name": "foo",
+        "type": {
+          "type": "ident",
+          "name": "number"
+        }
+      },
+      {
+        "name": "bar",
+        "type": {
+          "type": "ident",
+          "name": "string"
+        }
+      }
+    ],
+    "file": "test/diffargname.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "function"
+  }
+}

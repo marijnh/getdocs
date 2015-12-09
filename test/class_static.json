@@ -1,0 +1,43 @@
+{
+  "Foo": {
+    "description": " The Foo class",
+    "file": "test/class_static.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "class",
+    "extends": "Bar",
+    "properties": {
+      "m": {
+        "type": "function",
+        "params": [
+          {
+            "type": {
+              "type": "ident",
+              "name": "number"
+            },
+            "name": "a"
+          },
+          {
+            "type": {
+              "type": "ident",
+              "name": "string"
+            },
+            "name": "b"
+          }
+        ],
+        "returns": {
+          "type": "ident",
+          "name": "bool"
+        },
+        "file": "test/class_static.js",
+        "loc": {
+          "line": 4,
+          "column": 2
+        },
+        "kind": "method"
+      }
+    }
+  }
+}

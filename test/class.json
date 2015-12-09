@@ -1,0 +1,61 @@
+{
+  "Foo": {
+    "description": " The Foo class",
+    "file": "test/class.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "class",
+    "instanceProperties": {
+      "m": {
+        "type": "function",
+        "params": [
+          {
+            "type": {
+              "type": "ident",
+              "name": "number"
+            },
+            "name": "a"
+          },
+          {
+            "type": {
+              "type": "ident",
+              "name": "string"
+            },
+            "name": "b"
+          }
+        ],
+        "returns": {
+          "type": "ident",
+          "name": "bool"
+        },
+        "file": "test/class.js",
+        "loc": {
+          "line": 9,
+          "column": 2
+        },
+        "kind": "method"
+      }
+    },
+    "extends": "Bar",
+    "constructor": {
+      "kind": "constructor",
+      "type": "function",
+      "params": [
+        {
+          "type": {
+            "type": "any"
+          },
+          "name": "a"
+        },
+        {
+          "type": {
+            "type": "any"
+          },
+          "name": "b"
+        }
+      ]
+    }
+  }
+}

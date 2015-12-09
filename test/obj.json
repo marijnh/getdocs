@@ -1,0 +1,33 @@
+{
+  "obj": {
+    "type": "object",
+    "properties": {
+      "extra": {
+        "type": "ident",
+        "name": "number"
+      },
+      "foo": {
+        "description": " A property",
+        "file": "test/obj.js",
+        "loc": {
+          "line": 4,
+          "column": 2
+        }
+      },
+      "baz": {
+        "description": " An added property",
+        "file": "test/obj.js",
+        "loc": {
+          "line": 9,
+          "column": 0
+        }
+      }
+    },
+    "file": "test/obj.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "let"
+  }
+}

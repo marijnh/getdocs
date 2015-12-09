@@ -1,0 +1,28 @@
+{
+  "bar": {
+    "type": "function",
+    "params": [
+      {
+        "type": {
+          "type": "array",
+          "content": {
+            "type": "ident",
+            "name": "string"
+          }
+        },
+        "rest": true,
+        "name": "stuff"
+      }
+    ],
+    "returns": {
+      "type": "ident",
+      "name": "bool"
+    },
+    "file": "test/restarg.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "function"
+  }
+}

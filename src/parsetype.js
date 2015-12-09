@@ -1,18 +1,17 @@
-module.exports = function(string, loc) {
-  var input = new Input(string, loc)
+module.exports = function(string, start, loc) {
+  var input = new Input(string, start, loc)
   var result = parse(input)
   input.skip()
-  if (!input.atEnd()) input.error("Unrecognized text after type: " + string.slice(input.pos))
-  return result
+  return {type: result, end: input.pos}
 }
 
 function isSpace(ch) {
   return (ch < 14 && ch > 8) || ch === 32 || ch === 160;
 }
 
-function Input(string, loc) {
+function Input(string, start, loc) {
   this.str = string
-  this.pos = 0
+  this.pos = start
   this.loc = loc
   this.skip()
 }
@@ -75,18 +74,18 @@ function parse(input) {
     if (!input.eat("]")) input.error("Unclosed array type")
     return type
   } else if (input.eat("{")) {
-    var type = {type: "object", properties: []}
+    var type = {type: "object", properties: {}}
     while (!input.eat("}")) {
       if (type.properties.length && !input.eat(",")) input.error("Missing comma")
       var name = input.match(/^([\w$]+)\s*:/)
       if (!name) input.error("Malformed object type")
-      type.properties.push({name: name[1], type: parse(input)})
+      type.properties[name[1]] = parse(input)
     }
     return type
   } else {
     var name = input.match(/^[\w$]+(?:\.[\w$]+)*/)
     if (!name) input.error("Unexpected syntax: " + input.str.slice(input.pos, input.pos + 5))
-    var type = {type: "named", name: name[0]}
+    var type = {type: "ident", name: name[0]}
     if (input.eat("<")) {
       type.content = parse(input)
       if (!input.eat(">")) input.error("Missing >")

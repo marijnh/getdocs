@@ -1,0 +1,43 @@
+{
+  "Foo": {
+    "description": " The Foo class",
+    "file": "test/class_addmethod.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "class",
+    "instanceProperties": {
+      "bar": {
+        "type": "function",
+        "params": [
+          {
+            "type": {
+              "type": "ident",
+              "name": "number"
+            },
+            "name": "a"
+          },
+          {
+            "type": {
+              "type": "ident",
+              "name": "string"
+            },
+            "name": "b"
+          }
+        ],
+        "returns": {
+          "type": "ident",
+          "name": "bool"
+        },
+        "description": "A method",
+        "file": "test/class_addmethod.js",
+        "loc": {
+          "line": 6,
+          "column": 0
+        },
+        "kind": "function"
+      }
+    }
+  }
+}

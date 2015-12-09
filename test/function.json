@@ -1,0 +1,32 @@
+{
+  "add": {
+    "type": "function",
+    "params": [
+      {
+        "type": {
+          "type": "ident",
+          "name": "number"
+        },
+        "name": "a"
+      },
+      {
+        "type": {
+          "type": "ident",
+          "name": "number"
+        },
+        "name": "b"
+      }
+    ],
+    "returns": {
+      "type": "ident",
+      "name": "number"
+    },
+    "description": "Adds two numbers",
+    "file": "test/function.js",
+    "loc": {
+      "line": 3,
+      "column": 0
+    },
+    "kind": "function"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "foo": {
+    "type": "function",
+    "params": [
+      {
+        "type": {
+          "type": "ident",
+          "name": "bool"
+        },
+        "default": "false",
+        "optional": true,
+        "name": "arg"
+      }
+    ],
+    "file": "test/defaultarg.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "function"
+  }
+}

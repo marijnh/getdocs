@@ -5,21 +5,16 @@ var commentsBefore = require("./commentsbefore")
 var parseType = require("./parsetype")
 
 
-exports.gather = function(items, file) {
-  var ast = acorn.parse(file.text, {ecmaVersion: 6, locations: true, sourceFile: file})
+exports.gather = function(text, filename, items) {
+  if (!items) items = {}
+  var ast = acorn.parse(text, {ecmaVersion: 6, locations: true, sourceFile: {text: text, name: filename}})
   walk.simple(ast, {
     VariableDeclaration: function(node) {
-      var above = get(node)
-      if (above) {
-        above.kind = node.kind
-        add(items, node.declarations[0].id.name, above)
-      }
+      var above = get(node), decl0 = node.declarations[0]
+      if (above) add(items, decl0.id.name, inferExpr(decl0.init, above, node.kind))
       for (var i = above ? 1 : 0; i < node.declarations.length; i++) {
         var decl = node.declarations[i], data = get(decl)
-        if (data) {
-          decl.kind = node.kind
-          add(items, decl.id.name, data)
-        }
+        if (data) add(items, decl.id.name, inferExpr(decl.init, data, node.kind))
       }
     },
     FunctionDeclaration: function(node) {
@@ -31,27 +26,82 @@ exports.gather = function(items, file) {
       if (data) add(items, node.id.name, inferClass(node, data))
     },
     AssignmentExpression: function(node) {
-      // FIXME also if rhs is objectexpression or classexpression, check properties
+      var data = get(node)
+      if (!data) return
+      var path = [], left = node.left
+      while (left.type == "MemberExpression" && !left.computed) {
+        path.push(left.property.name)
+        left = left.object
+      }
+      if (left.type != "Identifier") return
+      path.push(left.name)
+      var target = items
+      for (var i = path.length - 1; i > 0; i--) {
+        var name = path[i]
+        var obj = target[name] || (target[name] = {})
+        var descend = "properties"
+        if (i > 1 && path[i - 1] == "prototype") {
+          descend = "instanceProperties"
+          i--
+        }
+        target = obj[descend] || (obj[descend] = {})
+      }
+      add(target, path[0], inferExpr(node.right, data))
     }
   })
+  return items
+}
+
+function getDescription(comments, remove) {
+  var out = ""
+  for (var i = 0; i < comments.length; i++) {
+    var cur = i ? comments[i] : comments[i].slice(remove)
+    if (/\S/.test(cur))
+      out += (out ? "\n\n" : "") + cur
+  }
+  return out
 }
 
 function get(node) {
   var comments = commentsBefore(node.loc.source.text, node.start), m
   for (var i = comments.length - 1; i >= 0; i--) {
-    if (m = /^\s*::\s*(.*)/.exec(comments[i])) {
-      var data = parseType(m[1], node.loc)
-      data.description = comments.slice(i + 1).join("\n\n")
-      return data
-    } else if (m = /^\s*:-((?:\s|^).*)/.exec(comments[i])) {
-      return {description: (m[1] ? [m[1]] : []).concat(comments.slice(i + 1)).join("\n\n")}
+    var decl = /^\s*(:[-:])/.exec(comments[i])
+    if (!decl) continue
+    var data, descStart
+    if (decl[1] == "::") {
+      var parsed = parseType(comments[i], decl[0].length, node.loc)
+      data = parsed.type
+      descStart = parsed.end
+    } else {
+      data = {}
+      descStart = decl[0].length
+    }
+    var desc = getDescription(comments.slice(i), descStart)
+    if (desc) data.description = desc
+    data.file = node.loc.source.name
+    data.loc = node.loc.start
+    return data
+  }
+}
+
+function extend(from, to, path) {
+  for (var prop in from) {
+    if (!to.hasOwnProperty(prop)) {
+      to[prop] = from[prop]
+    } else if (prop == "properties" || prop == "instanceProperties") {
+      extend(from[prop], to[prop], path + "." + prop)
+    } else {
+      throw new SyntaxError("Conflicting information for " + path + "." + prop)
     }
   }
 }
 
 function add(items, name, data) {
-  if (items[name]) throw new SyntaxError("Duplicate documentation for " + name)
-  items[name] = data
+  var found = items[name]
+  if (!found)
+    items[name] = data
+  else
+    extend(data, found, name)
 }
 
 function inferParam(n) {
@@ -71,7 +121,7 @@ function inferParam(n) {
 }
 
 function inferFn(node, data, kind) {
-  data.kind = kind
+  if (kind) data.kind = kind
   var inferredParams = node.params.map(inferParam)
 
   if (!data.type) {
@@ -89,7 +139,6 @@ function inferFn(node, data, kind) {
 
 function inferClass(node, data) {
   data.kind = "class"
-  data.instanceProperties = {}
   if (node.superClass && node.superClass.type == "Identifier")
     data.extends = node.superClass.name
   for (var i = 0; i < node.body.body.length; i++) {
@@ -104,7 +153,30 @@ function inferClass(node, data) {
     if (!itemData) continue
     inferFn(item.value, itemData, item.kind == "get" ? "getter" : "method")
     var prop = item.static ? "properties" : "instanceProperties"
-    ;(data[prop] || (data[prop] = {}))[item.key.name] = itemData
+    add(data[prop] || (data[prop] = {}), item.key.name, itemData)
+  }
+  return data
+}
+
+function inferExpr(node, data, kind) {
+  if (kind) data.kind = kind
+  if (!node) return data
+  if (node.type == "ObjectExpression")
+    inferObj(node, data)
+  else if (node.type == "ClassExpression")
+    inferClass(node, data)
+  else if (node.type == "FunctionExpression" || node.type == "ArrowFunctionExpression")
+    inferFn(node, data, "function")
+  return data
+}
+
+function inferObj(node, data) {
+  for (var i = 0; i < node.properties.length; i++) {
+    var prop = node.properties[i]
+    if (prop.computed || prop.key.type != "Identifier") continue
+    var propData = get(prop)
+    if (!propData) continue
+    add(data.properties || (data.properties = {}), prop.key.name, inferExpr(prop.value, propData))
   }
   return data
 }

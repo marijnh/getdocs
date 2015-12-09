@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "Getdocs is not JSDoc",
   "main": "src/index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "node test/run.js"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/marijnh/getdocs.git"
