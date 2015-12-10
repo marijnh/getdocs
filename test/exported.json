@@ -1,0 +1,35 @@
+{
+  "hello": {
+    "type": "function",
+    "params": [],
+    "returns": {
+      "type": "string"
+    },
+    "file": "test/exported.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "kind": "function",
+    "exported": true
+  },
+  "x": {
+    "type": "number",
+    "file": "test/exported.js",
+    "loc": {
+      "line": 5,
+      "column": 0
+    },
+    "kind": "var",
+    "exported": true
+  },
+  "default": {
+    "type": "string",
+    "file": "test/exported.js",
+    "loc": {
+      "line": 8,
+      "column": 0
+    },
+    "exported": true
+  }
+}

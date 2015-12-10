@@ -70,6 +70,8 @@ module.exports = function(text, filename, parse, callbacks) {
       throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
     callbacks[top.type](top, parse(top, strip(comment.text)), stack)
   }
+
+  return ast
 }
 
 function Found() {}

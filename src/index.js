@@ -4,20 +4,20 @@ var findDocComments = require("./doccomments")
 exports.gather = function(text, filename, items) {
   if (!items) items = {}
 
-  findDocComments(text, filename, parseComment, {
+  var ast = findDocComments(text, filename, parseComment, {
     // FIXME destructuring
     VariableDeclaration: function(node, data) {
       var decl0 = node.declarations[0]
-      add(items, decl0.id.name, inferExpr(decl0.init, data, node.kind, decl0.id.name))
+      return add(items, decl0.id.name, inferExpr(decl0.init, data, node.kind, decl0.id.name))
     },
 
     VariableDeclarator: function(node, data, ancestors) {
       var kind = ancestors[ancestors.length - 2].kind
-      add(items, node.id.name, inferExpr(node.init, data, kind, node.id.name))
+      return add(items, node.id.name, inferExpr(node.init, data, kind, node.id.name))
     },
 
     FunctionDeclaration: function(node, data) {
-      add(items, node.id.name, inferFn(node, data, "function", node.id.name))
+      return add(items, node.id.name, inferFn(node, data, "function", node.id.name))
     },
 
     ClassDeclaration: function(node, data) {
@@ -44,8 +44,37 @@ exports.gather = function(text, filename, items) {
         add(deref(parent, prop), propName(node),
             inferFn(node.value, data, node.kind == "get" ? "getter" : node.kind == "set" ? "setter" : "method"))
       }
+    },
+
+    ExportNamedDeclaration: function(node, data, ancestors) {
+      data = this[node.declaration.type](node.declaration, data, ancestors)
+      data.exported = true
+    },
+
+    ExportDefaultDeclaration: function(node, data, ancestors) {
+      var decl = node.declaration
+      if (this[decl.type]) {
+        data = this[decl.type](decl, data, ancestors)
+        delete items[decl.id.name]
+        items.default = data
+      } else {
+        data = add(items, "default", inferExpr(decl, data))
+      }
+      data.exported = true
     }
   })
+
+  // Mark locals exported with `export {a, b, c}` statements as exported
+  for (var i = 0; i < ast.body.length; i++) {
+    var node = ast.body[i]
+    if (node.type == "ExportNamedDeclaration" && !node.source) {
+      for (var j = 0; j < node.specifiers.length; j++) {
+        var spec = node.specifiers[j]
+        var known = items[spec.local.name]
+        if (known) known.exported = true
+      }
+    }
+  }
 
   return items
 }
@@ -108,6 +137,7 @@ function add(items, name, data) {
     items[name] = data
   else
     extend(data, found, name)
+  return found || data
 }
 
 function inferParam(n) {
