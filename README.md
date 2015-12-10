@@ -108,6 +108,16 @@ You can give tags an explicit value other than `"true"` by writing an
 `=` character followed either by a word or a quoted JavaScript-style
 string. For example `#chapter=selection` or `#added="2.1.0"`.
 
+These tags have a special meaning that is interpreted by getdocs:
+
+ * **forward**: Can be used to make the properties or methods of a
+   class or object appear in another class or object. A typical use
+   case is moving documentation from a private subclass into a public
+   abstract class. A tag like `#forward=Foo` will cause the properties
+   of the annotated thing to appear in the documentation for the thing
+   named `Foo` instead. Note that other information included in the
+   doc comments that has the `forward` tag will be ignored.
+
 ## Output JSON
 
 The returned object maps item names to item descriptions. The

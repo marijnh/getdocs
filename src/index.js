@@ -251,10 +251,20 @@ function findSelf(items, ancestors) {
 
 function findParent(items, ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
+    var forward = i && ancestors[i - 1].forward
+    if (forward) return fromPath(items, forward)
+
     var ancestor = ancestors[i]
     if (ancestor.type == "ClassDeclaration")
       return deref(items, ancestor.id.name)
     else if (i && (ancestor.type == "ClassExpression" || ancestor.type == "ObjectExpression"))
       return findAssigned(items, ancestors.slice(0, i))
   }
+}
+
+function fromPath(items, path) {
+  var target = items
+  for (var i = 0; i < path.length; i++)
+    target = deref(i ? deref(target, "properties") : target, path[i])
+  return target
 }

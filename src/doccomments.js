@@ -70,7 +70,12 @@ module.exports = function(text, filename, callbacks) {
     var top = stack && stack[stack.length - 1]
     if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
       throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
-    callbacks[top.type](top, parseComment(top, strip(comment.text)), stack)
+
+    var data = parseComment(top, strip(comment.text))
+    if (data.tags && data.tags.forward)
+      top.forward = data.tags.forward.split(".")
+    else
+      callbacks[top.type](top, data, stack)
   }
 
   return ast
