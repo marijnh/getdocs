@@ -6,7 +6,7 @@
         "type": "number"
       },
       "foo": {
-        "description": " A property",
+        "description": "A property",
         "file": "test/obj.js",
         "loc": {
           "line": 4,
@@ -14,7 +14,7 @@
         }
       },
       "baz": {
-        "description": " An added property",
+        "description": "An added property",
         "file": "test/obj.js",
         "loc": {
           "line": 9,

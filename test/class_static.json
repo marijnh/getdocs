@@ -1,6 +1,6 @@
 {
   "Foo": {
-    "description": " The Foo class",
+    "description": "The Foo class",
     "file": "test/class_static.js",
     "loc": {
       "line": 2,

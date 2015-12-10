@@ -1,6 +1,6 @@
 {
   "Foo": {
-    "description": " The Foo class",
+    "description": "The Foo class",
     "file": "test/class.js",
     "loc": {
       "line": 2,
@@ -25,7 +25,7 @@
         },
         "file": "test/class.js",
         "loc": {
-          "line": 9,
+          "line": 10,
           "column": 2
         },
         "kind": "method"
@@ -33,6 +33,11 @@
     },
     "extends": "Bar",
     "constructor": {
+      "file": "test/class.js",
+      "loc": {
+        "line": 4,
+        "column": 2
+      },
       "kind": "constructor",
       "type": "function",
       "params": [

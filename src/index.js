@@ -1,93 +1,87 @@
-var acorn = require("acorn/dist/acorn")
-var walk = require("acorn/dist/walk")
-
-var commentsBefore = require("./commentsbefore")
 var parseType = require("./parsetype")
-
+var findDocComments = require("./doccomments")
 
 exports.gather = function(text, filename, items) {
   if (!items) items = {}
-  var ast = acorn.parse(text, {
-    ecmaVersion: 6,
-    locations: true,
-    sourceFile: {text: text, name: filename},
-    sourceType: "module"
-  })
 
-  walk.simple(ast, {
-    VariableDeclaration: function(node) {
-      var above = get(node), decl0 = node.declarations[0]
-      if (above) add(items, decl0.id.name, inferExpr(decl0.init, above, node.kind))
-      for (var i = above ? 1 : 0; i < node.declarations.length; i++) {
-        var decl = node.declarations[i], data = get(decl)
-        if (data) add(items, decl.id.name, inferExpr(decl.init, data, node.kind))
-      }
+  findDocComments(text, filename, parseComment, {
+    VariableDeclaration: function(node, data) {
+      var decl0 = node.declarations[0]
+      add(items, decl0.id.name, inferExpr(decl0.init, data, node.kind))
     },
-    FunctionDeclaration: function(node) {
-      var data = get(node)
-      if (data) add(items, node.id.name, inferFn(node, data, "function"))
+
+    VariableDeclarator: function(node, data, ancestors) {
+      var kind = ancestors[ancestors.length - 2].kind
+      add(items, node.id.name, inferExpr(node.init, data, kind))
     },
-    ClassDeclaration: function(node) {
-      var data = get(node)
-      if (data) add(items, node.id.name, inferClass(node, data))
+
+    FunctionDeclaration: function(node, data) {
+      add(items, node.id.name, inferFn(node, data, "function"))
     },
-    AssignmentExpression: function(node) {
-      var data = get(node)
-      if (!data) return
-      var path = [], left = node.left
-      while (left.type == "MemberExpression" && !left.computed) {
-        path.push(left.property.name)
-        left = left.object
+
+    ClassDeclaration: function(node, data) {
+      add(items, node.id.name, inferClass(node, data))
+    },
+
+    AssignmentExpression: function(node, data, ancestors) {
+      var target = findLVal(items, node.left, ancestors)
+      extend(data, target)
+      inferExpr(node.right, target)
+    },
+
+    Property: function(node, data, ancestors) {
+      var parent = findParent(items, ancestors)
+      add(deref(parent, "properties"), propName(node, true), inferExpr(node.value, data))
+    },
+
+    // FIXME setters
+    MethodDefinition: function(node, data, ancestors) {
+      var parent = findParent(items, ancestors)
+      if (node.kind == "constructor") {
+        parent.constructor = inferFn(node.value, data, "constructor")
+      } else {
+        var prop = node.static ? "properties" : "instanceProperties"
+        add(deref(parent, prop), propName(node),
+            inferFn(node.value, data, node.kind == "get" ? "getter" : "method"))
       }
-      if (left.type != "Identifier") return
-      path.push(left.name)
-      var target = items
-      for (var i = path.length - 1; i > 0; i--) {
-        var name = path[i]
-        var obj = target[name] || (target[name] = {})
-        var descend = "properties"
-        if (i > 1 && path[i - 1] == "prototype") {
-          descend = "instanceProperties"
-          i--
-        }
-        target = obj[descend] || (obj[descend] = {})
-      }
-      add(target, path[0], inferExpr(node.right, data))
     }
   })
+
   return items
 }
 
-function getDescription(comments, remove) {
-  var out = ""
-  for (var i = 0; i < comments.length; i++) {
-    var cur = i ? comments[i] : comments[i].slice(remove)
-    if (/\S/.test(cur))
-      out += (out ? "\n\n" : "") + cur
-  }
-  return out
+function raise(msg, node) {
+  throw new SyntaxError(msg + " at " + node.loc.source.name + ":" + node.loc.start.line)
 }
 
-function get(node) {
-  var comments = commentsBefore(node.loc.source.text, node.start)
-  for (var i = comments.length - 1; i >= 0; i--) {
-    var decl = /^\s*(:[-:])/.exec(comments[i])
-    if (!decl) continue
-    var data, descStart
-    if (decl[1] == "::") {
-      var parsed = parseType(comments[i], decl[0].length, node.loc)
-      data = parsed.type
-      descStart = parsed.end
-    } else {
-      data = {}
-      descStart = decl[0].length
-    }
-    var desc = getDescription(comments.slice(i), descStart)
-    if (desc) data.description = desc
-    data.file = node.loc.source.name
-    data.loc = node.loc.start
-    return data
+function propName(node, force) {
+  var key = node.key || node.property
+  if (!node.computed && key.type == "Identifier") return key.name
+  if (key.type == "Literal") {
+    if (typeof key.value == "string") return key.value
+    if (typeof key.value == "number") return String(key.value)
   }
+  if (node.computed && key.type == "MemberExpression" &&
+      !key.computed && key.object.name == "Symbol")
+    return key.property.name
+  if (force) raise("Expected static property", node)
+}
+
+function parseComment(node, text) {
+  var match = /^\s*(;;|::)\s*/.exec(text)
+  var data, pos = match[0].length
+  if (match[1] == "::") {
+    var parsed = parseType(text, pos, node.loc)
+    data = parsed.type
+    pos = parsed.end
+  } else {
+    data = {}
+  }
+  data.file = node.loc.source.name
+  data.loc = node.loc.start
+  var desc = text.slice(pos)
+  if (/\S/.test(desc)) data.description = desc
+  return data
 }
 
 function extend(from, to, path) {
@@ -126,6 +120,8 @@ function inferParam(n) {
   return param
 }
 
+// FIXME recognize constructors
+
 function inferFn(node, data, kind) {
   if (kind) data.kind = kind
   var inferredParams = node.params.map(inferParam)
@@ -147,42 +143,87 @@ function inferClass(node, data) {
   data.kind = "class"
   if (node.superClass && node.superClass.type == "Identifier")
     data.extends = node.superClass.name
-  for (var i = 0; i < node.body.body.length; i++) {
-    var item = node.body.body[i]
-    if (item.computed || item.key.type != "Identifier" || item.kind == "set") continue
-    var itemData = get(item)
-    if (item.kind == "constructor") {
-      if (!itemData) itemData = {}
-      data.constructor = inferFn(item.value, itemData, "constructor")
-      continue
-    }
-    if (!itemData) continue
-    inferFn(item.value, itemData, item.kind == "get" ? "getter" : "method")
-    var prop = item.static ? "properties" : "instanceProperties"
-    add(data[prop] || (data[prop] = {}), item.key.name, itemData)
-  }
   return data
 }
 
 function inferExpr(node, data, kind) {
   if (kind) data.kind = kind
   if (!node) return data
-  if (node.type == "ObjectExpression")
-    inferObj(node, data)
-  else if (node.type == "ClassExpression")
+  if (node.type == "ClassExpression")
     inferClass(node, data)
   else if (node.type == "FunctionExpression" || node.type == "ArrowFunctionExpression")
     inferFn(node, data, "function")
   return data
 }
 
-function inferObj(node, data) {
-  for (var i = 0; i < node.properties.length; i++) {
-    var prop = node.properties[i]
-    if (prop.computed || prop.key.type != "Identifier") continue
-    var propData = get(prop)
-    if (!propData) continue
-    add(data.properties || (data.properties = {}), prop.key.name, inferExpr(prop.value, propData))
+// Deriving context from ancestor nodes
+
+function deref(obj, name) {
+  return obj[name] || (obj[name] = {})
+}
+
+function findLVal(items, lval, ancestors) {
+  var path = [], target
+  while (lval.type == "MemberExpression" && !lval.computed) {
+    path.push(lval.property.name)
+    lval = lval.object
   }
-  return data
+  if (lval.type == "Identifier")
+    target = deref(items, lval.name)
+  else if (lval.type == "ThisExpression")
+    target = findSelf(items, ancestors.slice(0, ancestors.length - 1))
+  for (var i = path.length - 1; i >= 0; i--) {
+    var name = path[i], descend = "properties"
+    if (name == "prototype" && i) {
+      name = path[--i]
+      descend = "instanceProperties"
+    }
+    target = deref(deref(target, descend), name)
+  }
+  return target
+}
+
+function findAssigned(items, ancestors) {
+  var top = ancestors[ancestors.length - 1]
+  if (top.type == "VariableDeclarator" && top.id.type == "Identifier")
+    return deref(items, top.id.name)
+  else if (top.type == "AssignmentExpression")
+    return findLVal(items, top.left, ancestors)
+  else
+    raise("Could not derive a name", top)
+}
+
+function findPrototype(items, ancestors) {
+  var assign = ancestors[ancestors.length - 1]
+  if (assign.type != "AssignmentExpression") return null
+  for (var i = 0, lval = assign.left; i < 2; i++) {
+    if (lval.type != "MemberExpression" || lval.computed) return null
+    if (lval.property.name == "prototype")
+      return findLVal(items, lval.object, ancestors, true)
+    lval = lval.object
+  }
+}
+
+function findSelf(items, ancestors) {
+  for (var i = ancestors.lenght - 1; i >= 0; i--) {
+    var ancestor = ancestors[i], found
+    if (ancestor.type == "ClassDeclaration")
+      return deref(items, ancestor.id.name, true)
+    else if (i && ancestor.type == "ClassExpression")
+      return findAssigned(items, ancestors.slice(0, i), true)
+    else if (i && /Function/.test(ancestor.type) &&
+             (found = findPrototype(items, ancestors.slice(0, i))))
+      return found
+  }
+  raise("No context found for 'this'", ancestors[ancestors.length - 1])
+}
+
+function findParent(items, ancestors) {
+  for (var i = ancestors.length - 1; i >= 0; i--) {
+    var ancestor = ancestors[i]
+    if (ancestor.type == "ClassDeclaration")
+      return deref(items, ancestor.id.name)
+    else if (i && (ancestor.type == "ClassExpression" || ancestor.type == "ObjectExpression"))
+      return findAssigned(items, ancestors.slice(0, i))
+  }
 }

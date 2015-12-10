@@ -2,9 +2,11 @@ var fs = require("fs")
 
 var getdocs = require("../src")
 
+var filter = process.argv[2]
+
 fs.readdirSync(__dirname).forEach(function(filename) {
   var isJSON = /^([^\.]+)\.json$/.exec(filename)
-  if (!isJSON) return
+  if (!isJSON || (filter && isJSON[1].indexOf(filter) != 0)) return
   
   var expected = JSON.parse(fs.readFileSync(__dirname + "/" + filename, "utf8"))
   var jsfile = "/" + isJSON[1] + ".js"
