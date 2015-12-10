@@ -91,7 +91,7 @@ function propName(node, force) {
   }
   if (node.computed && key.type == "MemberExpression" &&
       !key.computed && key.object.name == "Symbol")
-    return key.property.name
+    return "[Symbol." + key.property.name + "]"
   if (force) raise("Expected static property", node)
 }
 
@@ -131,6 +131,10 @@ function inferParam(n) {
   return param
 }
 
+function ctorName(name) {
+  return name && /^[A-Z]/.test(name)
+}
+
 function inferFn(node, data, kind, name) {
   if (kind) data.kind = kind
   var inferredParams = node.params.map(inferParam)
@@ -146,7 +150,7 @@ function inferFn(node, data, kind, name) {
   }
   if (node.generator) data.generator = true
 
-  if (name && /^[A-Z]/.test(name)) {
+  if (ctorName(name)) {
     data.kind = "constructor"
     return {constructor: data, kind: "class", file: node.loc.source.name, loc: node.loc.start}
   } else {
@@ -179,8 +183,8 @@ function deref(obj, name) {
 
 function findLVal(items, lval, ancestors) {
   var path = [], target, inst = false
-  while (lval.type == "MemberExpression" && !lval.computed) {
-    path.push(lval.property.name)
+  while (lval.type == "MemberExpression") {
+    path.push(propName(lval))
     lval = lval.object
   }
   if (lval.type == "Identifier") {
@@ -188,6 +192,8 @@ function findLVal(items, lval, ancestors) {
   } else if (lval.type == "ThisExpression") {
     target = findSelf(items, ancestors.slice(0, ancestors.length - 1))
     inst = true
+  } else {
+    raise("Could not derive a target for this assignment", lval)
   }
 
   for (var i = path.length - 1; i >= 0; i--) {
@@ -216,9 +222,7 @@ function assignedName(node) {
   if (node.type == "VariableDeclarator" && node.id.type == "Identifier")
     return node.id.name
   else if (node.type == "AssignmentExpression")
-    return propName(node.left) || ""
-  else
-    return ""
+    return propName(node.left)
 }
 
 function findPrototype(items, ancestors) {
@@ -237,10 +241,10 @@ function findSelf(items, ancestors) {
     var ancestor = ancestors[i], found
     if (ancestor.type == "ClassDeclaration")
       return deref(items, ancestor.id.name)
-    else if (ancestor.type == "FunctionDeclaration" && /^[A-Z]/.test(ancestor.id.name))
+    else if (ancestor.type == "FunctionDeclaration" && ctorName(ancestor.id.name))
       return deref(items, ancestor.id.name)
     else if (i && (ancestor.type == "ClassExpression" ||
-                   ancestor.type == "FunctionExpression" && /^[A-Z]/.test(assignedName(ancestors[i - 1]))))
+                   ancestor.type == "FunctionExpression" && ctorName(assignedName(ancestors[i - 1]))))
       return findAssigned(items, ancestors.slice(0, i))
     else if (i && /Function/.test(ancestor.type) &&
              (found = findPrototype(items, ancestors.slice(0, i))))
