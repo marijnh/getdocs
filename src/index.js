@@ -21,7 +21,7 @@ exports.gather = function(text, filename, items) {
     },
 
     ClassDeclaration: function(node, data) {
-      add(items, node.id.name, inferClass(node, data))
+      return add(items, node.id.name, inferClass(node, data))
     },
 
     AssignmentExpression: function(node, data, ancestors) {
@@ -48,6 +48,7 @@ exports.gather = function(text, filename, items) {
 
     ExportNamedDeclaration: function(node, data, ancestors) {
       data = this[node.declaration.type](node.declaration, data, ancestors)
+      if (!data) console.log("OW", node.declaration.type)
       data.exported = true
     },
 
