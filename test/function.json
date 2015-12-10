@@ -1,6 +1,6 @@
 {
   "add": {
-    "type": "function",
+    "type": "Function",
     "params": [
       {
         "type": "number",

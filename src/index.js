@@ -161,9 +161,9 @@ function inferFn(node, data, kind, name) {
   var inferredParams = node.params.map(inferParam)
 
   if (!data.type) {
-    data.type = "function"
+    data.type = "Function"
     data.params = inferredParams
-  } else if (data.type == "function") {
+  } else if (data.type == "Function") {
     for (var i = 0, e = Math.min(data.params.length, node.params.length); i < e; i++) {
       var from = inferredParams[i], to = data.params[i]
       for (var prop in from) if (!to.hasOwnProperty(prop)) to[prop] = from[prop]

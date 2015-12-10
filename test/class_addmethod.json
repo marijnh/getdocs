@@ -9,7 +9,7 @@
     "kind": "class",
     "instanceProperties": {
       "bar": {
-        "type": "function",
+        "type": "Function",
         "params": [
           {
             "type": "number",

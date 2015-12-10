@@ -9,7 +9,7 @@
     "kind": "class",
     "instanceProperties": {
       "m": {
-        "type": "function",
+        "type": "Function",
         "params": [
           {
             "type": "number",
@@ -39,7 +39,7 @@
         "column": 2
       },
       "kind": "constructor",
-      "type": "function",
+      "type": "Function",
       "params": [
         {
           "type": "any",

@@ -12,7 +12,7 @@
     },
     "description": "Hello!",
     "kind": "function",
-    "type": "function",
+    "type": "Function",
     "params": []
   }
 }

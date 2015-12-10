@@ -1,6 +1,6 @@
 {
   "x": {
-    "type": "function",
+    "type": "Function",
     "params": [
       {
         "name": "foo",

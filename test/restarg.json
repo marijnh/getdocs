@@ -1,9 +1,9 @@
 {
   "bar": {
-    "type": "function",
+    "type": "Function",
     "params": [
       {
-        "type": "array",
+        "type": "Array",
         "content": {
           "type": "string"
         },

@@ -1,6 +1,6 @@
 {
   "obj": {
-    "type": "object",
+    "type": "Object",
     "properties": {
       "extra": {
         "type": "number"

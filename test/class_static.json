@@ -10,7 +10,7 @@
     "extends": "Bar",
     "properties": {
       "m": {
-        "type": "function",
+        "type": "Function",
         "params": [
           {
             "type": "number",

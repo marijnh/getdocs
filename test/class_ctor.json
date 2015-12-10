@@ -1,7 +1,7 @@
 {
   "Point": {
     "constructor": {
-      "type": "function",
+      "type": "Function",
       "params": [
         {
           "type": "number",

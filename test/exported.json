@@ -1,6 +1,6 @@
 {
   "hello": {
-    "type": "function",
+    "type": "Function",
     "params": [],
     "returns": {
       "type": "string"

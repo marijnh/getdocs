@@ -55,7 +55,7 @@ function parse(input) {
   } else if (input.eat("*")) {
     return {type: "any"}
   } else if (input.eat("(")) {
-    var type = {type: "function", params: []}
+    var type = {type: "Function", params: []}
     while (!input.eat(")")) {
       if (type.params.length && !input.eat(",")) input.error("Missing comma")
       var rest = input.match(/^\.\.\./)
@@ -70,11 +70,11 @@ function parse(input) {
       type.returns = parse(input)
     return type
   } else if (input.eat("[")) {
-    var type = {type: "array", content: parse(input)}
+    var type = {type: "Array", content: parse(input)}
     if (!input.eat("]")) input.error("Unclosed array type")
     return type
   } else if (input.eat("{")) {
-    var type = {type: "object", properties: {}}
+    var type = {type: "Object", properties: {}}
     while (!input.eat("}")) {
       if (type.properties.length && !input.eat(",")) input.error("Missing comma")
       var name = input.match(/^([\w$]+)\s*:/)

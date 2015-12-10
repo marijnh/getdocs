@@ -8,7 +8,7 @@
     "description": "A Foo",
     "kind": "class",
     "constructor": {
-      "type": "function",
+      "type": "Function",
       "params": [
         {
           "type": "number",
@@ -42,7 +42,7 @@
         "description": "The b property"
       },
       "doStuff": {
-        "type": "function",
+        "type": "Function",
         "params": [],
         "file": "test/class_this.js",
         "loc": {
