@@ -1,0 +1,18 @@
+{
+  "foo": {
+    "file": "test/tags.js",
+    "loc": {
+      "line": 3,
+      "column": 0
+    },
+    "tags": {
+      "deprecated": "true",
+      "exported": "false",
+      "context": "a \"string\""
+    },
+    "description": "Hello!",
+    "kind": "function",
+    "type": "function",
+    "params": []
+  }
+}

@@ -79,8 +79,14 @@ function parseComment(node, text) {
   }
   data.file = node.loc.source.name
   data.loc = node.loc.start
-  var desc = text.slice(pos)
-  if (/\S/.test(desc)) data.description = desc
+  text = text.slice(pos)
+  while (match = /^\s*#(\w+)(?:=(\w+|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
+    text = text.slice(match[0].length)
+    var value = match[2] || "true"
+    if (value.charAt(0) == '"') value = JSON.parse(value)
+    deref(data, "tags")[match[1]] = value
+  }
+  if (/\S/.test(text)) data.description = text
   return data
 }
 
