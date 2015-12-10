@@ -1,10 +1,9 @@
-var parseType = require("./parsetype")
 var findDocComments = require("./doccomments")
 
 exports.gather = function(text, filename, items) {
   if (!items) items = {}
 
-  var ast = findDocComments(text, filename, parseComment, {
+  var ast = findDocComments(text, filename, {
     // FIXME destructuring
     VariableDeclaration: function(node, data) {
       var decl0 = node.declarations[0]
@@ -41,14 +40,13 @@ exports.gather = function(text, filename, items) {
         parent.constructor = inferFn(node.value, data, "constructor")
       } else {
         var prop = node.static ? "properties" : "instanceProperties"
-        add(deref(parent, prop), propName(node),
+        add(deref(parent, prop), propName(node, true),
             inferFn(node.value, data, node.kind == "get" ? "getter" : node.kind == "set" ? "setter" : "method"))
       }
     },
 
     ExportNamedDeclaration: function(node, data, ancestors) {
       data = this[node.declaration.type](node.declaration, data, ancestors)
-      if (!data) console.log("OW", node.declaration.type)
       data.exported = true
     },
 
@@ -97,29 +95,6 @@ function propName(node, force) {
   if (force) raise("Expected static property", node)
 }
 
-function parseComment(node, text) {
-  var match = /^\s*(;;|::)\s*/.exec(text)
-  var data, pos = match[0].length
-  if (match[1] == "::") {
-    var parsed = parseType(text, pos, node.loc)
-    data = parsed.type
-    pos = parsed.end
-  } else {
-    data = {}
-  }
-  data.file = node.loc.source.name
-  data.loc = node.loc.start
-  text = text.slice(pos)
-  while (match = /^\s*#(\w+)(?:=(\w+|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
-    text = text.slice(match[0].length)
-    var value = match[2] || "true"
-    if (value.charAt(0) == '"') value = JSON.parse(value)
-    deref(data, "tags")[match[1]] = value
-  }
-  if (/\S/.test(text)) data.description = text
-  return data
-}
-
 function extend(from, to, path) {
   for (var prop in from) {
     if (!to.hasOwnProperty(prop)) {
@@ -130,15 +105,14 @@ function extend(from, to, path) {
       throw new SyntaxError("Conflicting information for " + path + "." + prop)
     }
   }
+  return to
 }
 
 function add(items, name, data) {
-  var found = items[name]
-  if (!found)
-    items[name] = data
+  if (!items.hasOwnProperty(name))
+    return items[name] = data
   else
-    extend(data, found, name)
-  return found || data
+    return extend(data, items[name], name)
 }
 
 function inferParam(n) {
