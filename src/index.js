@@ -5,18 +5,19 @@ exports.gather = function(text, filename, items) {
   if (!items) items = {}
 
   findDocComments(text, filename, parseComment, {
+    // FIXME destructuring
     VariableDeclaration: function(node, data) {
       var decl0 = node.declarations[0]
-      add(items, decl0.id.name, inferExpr(decl0.init, data, node.kind))
+      add(items, decl0.id.name, inferExpr(decl0.init, data, node.kind, decl0.id.name))
     },
 
     VariableDeclarator: function(node, data, ancestors) {
       var kind = ancestors[ancestors.length - 2].kind
-      add(items, node.id.name, inferExpr(node.init, data, kind))
+      add(items, node.id.name, inferExpr(node.init, data, kind, node.id.name))
     },
 
     FunctionDeclaration: function(node, data) {
-      add(items, node.id.name, inferFn(node, data, "function"))
+      add(items, node.id.name, inferFn(node, data, "function", node.id.name))
     },
 
     ClassDeclaration: function(node, data) {
@@ -26,15 +27,14 @@ exports.gather = function(text, filename, items) {
     AssignmentExpression: function(node, data, ancestors) {
       var target = findLVal(items, node.left, ancestors)
       extend(data, target)
-      inferExpr(node.right, target)
+      inferExpr(node.right, target, null, propName(node.left))
     },
 
     Property: function(node, data, ancestors) {
-      var parent = findParent(items, ancestors)
-      add(deref(parent, "properties"), propName(node, true), inferExpr(node.value, data))
+      var parent = findParent(items, ancestors), name = propName(node, true)
+      add(deref(parent, "properties"), name, inferExpr(node.value, data, null, name))
     },
 
-    // FIXME setters
     MethodDefinition: function(node, data, ancestors) {
       var parent = findParent(items, ancestors)
       if (node.kind == "constructor") {
@@ -42,7 +42,7 @@ exports.gather = function(text, filename, items) {
       } else {
         var prop = node.static ? "properties" : "instanceProperties"
         add(deref(parent, prop), propName(node),
-            inferFn(node.value, data, node.kind == "get" ? "getter" : "method"))
+            inferFn(node.value, data, node.kind == "get" ? "getter" : node.kind == "set" ? "setter" : "method"))
       }
     }
   })
@@ -120,9 +120,7 @@ function inferParam(n) {
   return param
 }
 
-// FIXME recognize constructors
-
-function inferFn(node, data, kind) {
+function inferFn(node, data, kind, name) {
   if (kind) data.kind = kind
   var inferredParams = node.params.map(inferParam)
 
@@ -136,7 +134,13 @@ function inferFn(node, data, kind) {
     }
   }
   if (node.generator) data.generator = true
-  return data
+
+  if (name && /^[A-Z]/.test(name)) {
+    data.kind = "constructor"
+    return {constructor: data, kind: "class", file: node.loc.source.name, loc: node.loc.start}
+  } else {
+    return data
+  }
 }
 
 function inferClass(node, data) {
@@ -146,13 +150,13 @@ function inferClass(node, data) {
   return data
 }
 
-function inferExpr(node, data, kind) {
+function inferExpr(node, data, kind, name) {
   if (kind) data.kind = kind
   if (!node) return data
   if (node.type == "ClassExpression")
     inferClass(node, data)
   else if (node.type == "FunctionExpression" || node.type == "ArrowFunctionExpression")
-    inferFn(node, data, "function")
+    inferFn(node, data, "function", name)
   return data
 }
 
@@ -163,22 +167,26 @@ function deref(obj, name) {
 }
 
 function findLVal(items, lval, ancestors) {
-  var path = [], target
+  var path = [], target, inst = false
   while (lval.type == "MemberExpression" && !lval.computed) {
     path.push(lval.property.name)
     lval = lval.object
   }
-  if (lval.type == "Identifier")
+  if (lval.type == "Identifier") {
     target = deref(items, lval.name)
-  else if (lval.type == "ThisExpression")
+  } else if (lval.type == "ThisExpression") {
     target = findSelf(items, ancestors.slice(0, ancestors.length - 1))
+    inst = true
+  }
+
   for (var i = path.length - 1; i >= 0; i--) {
-    var name = path[i], descend = "properties"
+    var name = path[i], descend = inst ? "instanceProperties" : "properties"
     if (name == "prototype" && i) {
       name = path[--i]
       descend = "instanceProperties"
     }
     target = deref(deref(target, descend), name)
+    inst = false
   }
   return target
 }
@@ -193,24 +201,36 @@ function findAssigned(items, ancestors) {
     raise("Could not derive a name", top)
 }
 
+function assignedName(node) {
+  if (node.type == "VariableDeclarator" && node.id.type == "Identifier")
+    return node.id.name
+  else if (node.type == "AssignmentExpression")
+    return propName(node.left) || ""
+  else
+    return ""
+}
+
 function findPrototype(items, ancestors) {
   var assign = ancestors[ancestors.length - 1]
   if (assign.type != "AssignmentExpression") return null
   for (var i = 0, lval = assign.left; i < 2; i++) {
     if (lval.type != "MemberExpression" || lval.computed) return null
     if (lval.property.name == "prototype")
-      return findLVal(items, lval.object, ancestors, true)
+      return findLVal(items, lval.object, ancestors)
     lval = lval.object
   }
 }
 
 function findSelf(items, ancestors) {
-  for (var i = ancestors.lenght - 1; i >= 0; i--) {
+  for (var i = ancestors.length - 1; i >= 0; i--) {
     var ancestor = ancestors[i], found
     if (ancestor.type == "ClassDeclaration")
-      return deref(items, ancestor.id.name, true)
-    else if (i && ancestor.type == "ClassExpression")
-      return findAssigned(items, ancestors.slice(0, i), true)
+      return deref(items, ancestor.id.name)
+    else if (ancestor.type == "FunctionDeclaration" && /^[A-Z]/.test(ancestor.id.name))
+      return deref(items, ancestor.id.name)
+    else if (i && (ancestor.type == "ClassExpression" ||
+                   ancestor.type == "FunctionExpression" && /^[A-Z]/.test(assignedName(ancestors[i - 1]))))
+      return findAssigned(items, ancestors.slice(0, i))
     else if (i && /Function/.test(ancestor.type) &&
              (found = findPrototype(items, ancestors.slice(0, i))))
       return found

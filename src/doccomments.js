@@ -1,5 +1,3 @@
-// FIXME rename
-
 var acorn = require("acorn/dist/acorn")
 var walk = require("acorn/dist/walk")
 

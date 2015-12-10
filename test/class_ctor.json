@@ -1,0 +1,50 @@
+{
+  "Point": {
+    "constructor": {
+      "type": "function",
+      "params": [
+        {
+          "type": "number",
+          "name": "x"
+        },
+        {
+          "type": "number",
+          "name": "y"
+        }
+      ],
+      "file": "test/class_ctor.js",
+      "loc": {
+        "line": 2,
+        "column": 0
+      },
+      "description": "A vector type",
+      "kind": "constructor"
+    },
+    "kind": "class",
+    "file": "test/class_ctor.js",
+    "loc": {
+      "line": 2,
+      "column": 0
+    },
+    "instanceProperties": {
+      "x": {
+        "type": "number",
+        "file": "test/class_ctor.js",
+        "loc": {
+          "line": 4,
+          "column": 2
+        },
+        "description": "The x coordinate"
+      },
+      "y": {
+        "type": "number",
+        "file": "test/class_ctor.js",
+        "loc": {
+          "line": 6,
+          "column": 2
+        },
+        "description": "The y coordinate"
+      }
+    }
+  }
+}
