@@ -74,9 +74,10 @@ function parse(input) {
     if (!input.eat("]")) input.error("Unclosed array type")
     return type
   } else if (input.eat("{")) {
-    var type = {type: "Object", properties: {}}
+    var type = {type: "Object", properties: {}}, first = true
     while (!input.eat("}")) {
-      if (type.properties.length && !input.eat(",")) input.error("Missing comma")
+      if (!first && !input.eat(",")) input.error("Missing comma")
+      first = false
       var name = input.match(/^([\w$]+)\s*:/)
       if (!name) input.error("Malformed object type")
       type.properties[name[1]] = parse(input)
