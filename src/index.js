@@ -238,6 +238,9 @@ function findPrototype(items, ancestors) {
 
 function findSelf(items, ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
+    var forward = i && ancestors[i - 1].forward
+    if (forward) return fromPath(items, forward)
+
     var ancestor = ancestors[i], found
     if (ancestor.type == "ClassDeclaration")
       return deref(items, ancestor.id.name)
