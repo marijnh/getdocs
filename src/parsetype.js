@@ -48,6 +48,15 @@ Input.prototype = {
 }
 
 function parse(input) {
+  var type = parseSingleType(input), union
+  while (input.eat("|")) {
+    if (!union) union = type = {type: "union", types: [type]}
+    union.types.push(parseSingleType(input))
+  }
+  return type
+}
+
+function parseSingleType(input) {
   if (input.eat("?")) {
     var inner = parse(input)
     inner.optional = true
