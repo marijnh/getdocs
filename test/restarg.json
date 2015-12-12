@@ -4,9 +4,9 @@
     "params": [
       {
         "type": "Array",
-        "content": {
+        "content": [{
           "type": "string"
-        },
+        }],
         "rest": true,
         "name": "stuff"
       }

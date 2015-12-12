@@ -70,8 +70,11 @@ function parse(input) {
       type.returns = parse(input)
     return type
   } else if (input.eat("[")) {
-    var type = {type: "Array", content: parse(input)}
-    if (!input.eat("]")) input.error("Unclosed array type")
+    var type = {type: "Array", content: [parse(input)]}
+    while (!input.eat("]")) {
+      if (!input.eat(",")) input.error("Missing comma or closing square bracket")
+      type.content.push(parse(input))
+    }
     return type
   } else if (input.eat("{")) {
     var type = {type: "Object", properties: {}}, first = true
