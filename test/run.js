@@ -19,18 +19,22 @@ fs.readdirSync(__dirname).forEach(function(filename) {
   }
 })
 
+function hop(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop)
+}
+
 function compare(a, b, path) {
   if (typeof a != "object" || typeof b != "object") {
     if (a !== b) throw new Error("Mismatch at " + path)
   } else {
-    for (var prop in a) if (a.hasOwnProperty(prop)) {
-      if (!b.hasOwnProperty(prop))
+    for (var prop in a) if (hop(a, prop)) {
+      if (!(prop in b))
         throw new Error("Unexpected property " + path + "." + prop)
       else
         compare(a[prop], b[prop], path + "." + prop)
     }
-    for (var prop in b) if (b.hasOwnProperty(prop)) {
-      if (!a.hasOwnProperty(prop))
+    for (var prop in b) if (hop(b, prop)) {
+      if (!(prop in a))
         throw new Error("Missing property " + path + "." + prop)
     }
   }

@@ -1,7 +1,7 @@
 var findDocComments = require("./doccomments")
 
 exports.gather = function(text, filename, items) {
-  if (!items) items = {}
+  if (!items) items = Object.create(null)
 
   var ast = findDocComments(text, filename, {
     // FIXME destructuring
@@ -97,7 +97,7 @@ function propName(node, force) {
 
 function extend(from, to, path) {
   for (var prop in from) {
-    if (!to.hasOwnProperty(prop)) {
+    if (!(prop in to)) {
       to[prop] = from[prop]
     } else if (prop == "properties" || prop == "instanceProperties") {
       extend(from[prop], to[prop], path + "." + prop)
@@ -109,14 +109,15 @@ function extend(from, to, path) {
 }
 
 function add(items, name, data) {
-  if (!items.hasOwnProperty(name))
+  if (!(name in items))
     return items[name] = data
   else
     return extend(data, items[name], name)
 }
 
 function inferParam(n) {
-  var param = {type: "any"}
+  var param = Object.create(null)
+  param.type = "any"
   if (n.type == "RestElement") {
     param.rest = true
     n = n.argument
@@ -145,7 +146,7 @@ function inferFn(node, data, kind, name) {
   } else if (data.type == "Function") {
     for (var i = 0, e = Math.min(data.params.length, node.params.length); i < e; i++) {
       var from = inferredParams[i], to = data.params[i]
-      for (var prop in from) if (!to.hasOwnProperty(prop)) to[prop] = from[prop]
+      for (var prop in from) if (!(prop in to)) to[prop] = from[prop]
     }
   }
   if (node.generator) data.generator = true
@@ -178,7 +179,7 @@ function inferExpr(node, data, kind, name) {
 // Deriving context from ancestor nodes
 
 function deref(obj, name) {
-  return obj[name] || (obj[name] = {})
+  return obj[name] || (obj[name] = Object.create(null))
 }
 
 function findLVal(items, lval, ancestors) {

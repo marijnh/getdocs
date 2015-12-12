@@ -111,7 +111,7 @@ function parseComment(node, text) {
     data = parsed.type
     pos = parsed.end
   } else {
-    data = {}
+    data = Object.create(null)
   }
   data.file = node.loc.source.name
   data.loc = node.loc.start
@@ -120,7 +120,7 @@ function parseComment(node, text) {
     text = text.slice(match[0].length)
     var value = match[2] || "true"
     if (value.charAt(0) == '"') value = JSON.parse(value)
-    ;(data.tags || (data.tags = {}))[match[1]] = value
+    ;(data.tags || (data.tags = Object.create(null)))[match[1]] = value
   }
   if (/\S/.test(text)) data.description = text
   return data

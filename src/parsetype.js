@@ -52,10 +52,13 @@ function parse(input) {
     var inner = parse(input)
     inner.optional = true
     return inner
-  } else if (input.eat("*")) {
-    return {type: "any"}
+  }
+  var type = Object.create(null)
+  if (input.eat("*")) {
+    type.type = "any"
   } else if (input.eat("(")) {
-    var type = {type: "Function", params: []}
+    type.type = "Function"
+    type.params = []
     while (!input.eat(")")) {
       if (type.params.length && !input.eat(",")) input.error("Missing comma or closing paren")
       var rest = input.match(/^\.\.\./)
@@ -68,28 +71,26 @@ function parse(input) {
     }
     if (input.match(/→|->/))
       type.returns = parse(input)
-    return type
   } else if (input.eat("[")) {
-    var type = {type: "Array", content: [parse(input)]}
+    type.type = "Array"
+    type.content = [parse(input)]
     while (!input.eat("]")) {
       if (!input.eat(",")) input.error("Missing comma or closing square bracket")
       type.content.push(parse(input))
     }
-    return type
   } else if (input.eat("{")) {
-    var type = {type: "Object", properties: {}}, first = true
-    while (!input.eat("}")) {
+    type.type = "Object"
+    type.properties = Object.create(null)
+    for (var first = true; !input.eat("}"); first = false) {
       if (!first && !input.eat(",")) input.error("Missing comma or closing brace")
-      first = false
       var name = input.match(/^([\w$]+)\s*:/)
       if (!name) input.error("Malformed object type")
       type.properties[name[1]] = parse(input)
     }
-    return type
   } else {
     var name = input.match(/^[\w$]+(?:\.[\w$]+)*/)
     if (!name) input.error("Unexpected syntax: " + input.str.slice(input.pos, input.pos + 5))
-    var type = {type: name[0]}
+    type.type = name[0]
     if (input.eat("<")) {
       type.content = []
       while (!input.eat(">")) {
@@ -97,6 +98,6 @@ function parse(input) {
         type.content.push(parse(input))
       }
     }
-    return type
   }
+  return type
 }

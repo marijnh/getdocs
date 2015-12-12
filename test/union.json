@@ -1,0 +1,56 @@
+{
+  "blah": {
+    "type": "Function",
+    "params": [
+      {
+        "type": "union",
+        "content": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "name": "x"
+      },
+      {
+        "type": "union",
+        "content": [
+          {
+            "type": "bool"
+          },
+          {
+            "type": "RegExp"
+          },
+          {
+            "type": "Array",
+            "content": [{
+              "type": "Error"
+            }]
+          }
+        ],
+        "optional": true,
+        "name": "y"
+      }
+    ],
+    "returns": {
+      "type": "union",
+      "content": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "bool"
+        }
+      ]
+    },
+    "file": "test/union.js",
+    "loc": {
+      "line": 3,
+      "column": 0
+    },
+    "description": "That's one complex signature",
+    "kind": "function"
+  }
+}
