@@ -41,7 +41,7 @@ function strip(lines) {
   return lines.join("\n")
 }
 
-module.exports = function(text, filename, callbacks) {
+module.exports = function(text, filename, findPos, infer) {
   var current = null, found = []
 
   var ast = acorn.parse(text, {
@@ -66,16 +66,19 @@ module.exports = function(text, filename, callbacks) {
 
   for (var i = 0; i < found.length; i++) {
     var comment = found[i]
-    var stack = findNodeAfter(ast, comment.end, callbacks)
+    var stack = findNodeAfter(ast, comment.end, findPos)
     var top = stack && stack[stack.length - 1]
     if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
       throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
 
     var data = parseComment(top, strip(comment.text), comment.startLoc)
-    if (data.tags && data.tags.forward)
+    if (data.tags && data.tags.forward) {
       top.forward = data.tags.forward.split(".")
-    else
-      callbacks[top.type](top, data, stack)
+    } else {
+      var pos = findPos[top.type](top, stack)
+      if (infer.hasOwnProperty(top.type)) data = infer[top.type](top, data, stack)
+      pos.add(data)
+    }
   }
 
   return ast

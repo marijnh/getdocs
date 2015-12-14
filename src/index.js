@@ -6,61 +6,85 @@ exports.gather = function(text, filename, items) {
 
   var ast = findDocComments(text, filename, {
     // FIXME destructuring
+    VariableDeclaration: function(node) { return new Pos(items, node.declarations[0].id.name) },
+
+    VariableDeclarator: function(node) { return new Pos(items, node.id.name) },
+
+    FunctionDeclaration: function(node) { return new Pos(items, node.id.name) },
+
+    ClassDeclaration: function(node) { return new Pos(items, node.id.name) },
+
+    AssignmentExpression: function(node, ancestors) {
+      return lvalPos(items, node.left, ancestors)
+    },
+
+    Property: function(node, ancestors) {
+      return new Pos(deref(findParent(items, ancestors), "properties"), propName(node, true))
+    },
+
+    MethodDefinition: function(node, ancestors) {
+      var parent = findParent(items, ancestors)
+      if (node.kind == "constructor")
+        return new Pos(parent, "constructor")
+      else
+        return new Pos(deref(parent, node.static ? "properties" : "instanceProperties"), propName(node, true))
+    },
+
+    ExportNamedDeclaration: function(node, ancestors) {
+      return this[node.declaration.type](node.declaration, ancestors)
+    },
+
+    ExportDefaultDeclaration: function() {
+      return new Pos(items, "default")
+    }
+  }, {
     VariableDeclaration: function(node, data) {
       var decl0 = node.declarations[0]
-      return add(items, decl0.id.name, inferExpr(decl0.init, data, node.kind, decl0.id.name))
+      return inferExpr(decl0.init, data, node.kind, decl0.id.name)
     },
 
     VariableDeclarator: function(node, data, ancestors) {
       var kind = ancestors[ancestors.length - 2].kind
-      return add(items, node.id.name, inferExpr(node.init, data, kind, node.id.name))
+      return inferExpr(node.init, data, kind, node.id.name)
     },
 
     FunctionDeclaration: function(node, data) {
-      return add(items, node.id.name, inferFn(node, data, "function", node.id.name))
+      return inferFn(node, data, "function", node.id.name)
     },
 
     ClassDeclaration: function(node, data) {
-      return add(items, node.id.name, inferClass(node, data))
+      return inferClass(node, data)
     },
 
-    AssignmentExpression: function(node, data, ancestors) {
-      var target = findLVal(items, node.left, ancestors)
-      extend(data, target)
-      inferExpr(node.right, target, null, propName(node.left))
+    AssignmentExpression: function(node, data) {
+      return inferExpr(node.right, data, null, propName(node.left))
     },
 
-    Property: function(node, data, ancestors) {
-      var parent = findParent(items, ancestors), name = propName(node, true)
-      add(deref(parent, "properties"), name, inferExpr(node.value, data, null, name))
+    Property: function(node, data) {
+      return inferExpr(node.value, data, null, propName(node, true))
     },
 
-    MethodDefinition: function(node, data, ancestors) {
-      var parent = findParent(items, ancestors)
-      if (node.kind == "constructor") {
-        parent.constructor = inferFn(node.value, data, "constructor")
-      } else {
-        var prop = node.static ? "properties" : "instanceProperties"
-        add(deref(parent, prop), propName(node, true),
-            inferFn(node.value, data, node.kind == "get" ? "getter" : node.kind == "set" ? "setter" : "method"))
-      }
+    MethodDefinition: function(node, data) {
+      var kind = node.kind
+      if (kind == "get") kind = "getter"
+      else if (kind == "set") kind = "setter"
+      return inferFn(node.value, data, kind)
     },
 
     ExportNamedDeclaration: function(node, data, ancestors) {
-      data = this[node.declaration.type](node.declaration, data, ancestors)
-      data.exported = true
+      var inner = this[node.declaration.type](node.declaration, data, ancestors)
+      inner.exported = true
+      return inner
     },
 
     ExportDefaultDeclaration: function(node, data, ancestors) {
       var decl = node.declaration
-      if (this[decl.type]) {
+      if (this[decl.type])
         data = this[decl.type](decl, data, ancestors)
-        delete items[decl.id.name]
-        items.default = data
-      } else {
-        data = add(items, "default", inferExpr(decl, data))
-      }
+      else
+        data = inferExpr(decl, data)
       data.exported = true
+      return data
     }
   })
 
@@ -94,26 +118,6 @@ function propName(node, force) {
       !key.computed && key.object.name == "Symbol")
     return "[Symbol." + key.property.name + "]"
   if (force) raise("Expected static property", node)
-}
-
-function extend(from, to, path) {
-  for (var prop in from) {
-    if (!(prop in to)) {
-      to[prop] = from[prop]
-    } else if (prop == "properties" || prop == "instanceProperties") {
-      extend(from[prop], to[prop], path + "." + prop)
-    } else {
-      throw new SyntaxError("Conflicting information for " + path + "." + prop)
-    }
-  }
-  return to
-}
-
-function add(items, name, data) {
-  if (!(name in items))
-    return items[name] = data
-  else
-    return extend(data, items[name], name)
 }
 
 function inferParam(n) {
@@ -184,16 +188,38 @@ function inferExpr(node, data, kind, name) {
 
 // Deriving context from ancestor nodes
 
+function Pos (parent, name) { this.parent = parent; this.name = name }
+
+function extend(from, to, path) {
+  for (var prop in from) {
+    if (!(prop in to)) {
+      to[prop] = from[prop]
+    } else if (prop == "properties" || prop == "instanceProperties") {
+      extend(from[prop], to[prop], path + "." + prop)
+    } else {
+      throw new SyntaxError("Conflicting information for " + path + "." + prop)
+    }
+  }
+  return to
+}
+
+Pos.prototype.add = function(data) {
+  var known = this.parent[this.name]
+  return known ? extend(data, known, this.name) : this.parent[this.name] = data
+}
+
 function deref(obj, name) {
   return obj[name] || (obj[name] = Object.create(null))
 }
 
-function findLVal(items, lval, ancestors) {
-  var path = [], target, inst = false
+function lvalPos(items, lval, ancestors) {
+  var path = [], target, name, inst = false
   while (lval.type == "MemberExpression") {
     path.push(propName(lval))
     lval = lval.object
   }
+  if (!path.length) raise("Could not derive a target for this assignment", lval)
+
   if (lval.type == "Identifier") {
     target = deref(items, lval.name)
   } else if (lval.type == "ThisExpression") {
@@ -209,10 +235,11 @@ function findLVal(items, lval, ancestors) {
       name = path[--i]
       descend = "instanceProperties"
     }
-    target = deref(deref(target, descend), name)
+    target = deref(target, descend)
+    if (i) target = deref(target, name)
     inst = false
   }
-  return target
+  return new Pos(target, path[0])
 }
 
 function findAssigned(items, ancestors) {
@@ -220,7 +247,7 @@ function findAssigned(items, ancestors) {
   if (top.type == "VariableDeclarator" && top.id.type == "Identifier")
     return deref(items, top.id.name)
   else if (top.type == "AssignmentExpression")
-    return findLVal(items, top.left, ancestors)
+    return lvalTarget(items, top.left, ancestors)
   else
     raise("Could not derive a name", top)
 }
@@ -232,13 +259,24 @@ function assignedName(node) {
     return propName(node.left)
 }
 
+function lvalTarget(items, lval, ancestors) {
+  if (lval.type == "Identifier") {
+    return items[lval.name]
+  } else if (lval.type == "ThisExpression") {
+    return findSelf(items, ancestors.slice(0, ancestors.length - 1))
+  } else if (lval.type == "MemberExpression") {
+    var found = lvalPos(items, lval, ancestors)
+    return deref(found.parent, found.name)
+  }
+}
+
 function findPrototype(items, ancestors) {
   var assign = ancestors[ancestors.length - 1]
   if (assign.type != "AssignmentExpression") return null
   for (var i = 0, lval = assign.left; i < 2; i++) {
     if (lval.type != "MemberExpression" || lval.computed) return null
     if (lval.property.name == "prototype")
-      return findLVal(items, lval.object, ancestors)
+      return lvalTarget(items, lval.object, ancestors)
     lval = lval.object
   }
 }
