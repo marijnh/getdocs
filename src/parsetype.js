@@ -70,7 +70,7 @@ function parse(input) {
       if (name && name[2]) param.optional = true
       type.params.push(param)
     }
-    if (input.match(/→|->/))
+    if (input.match(/^(?:→|->)/))
       type.returns = parse(input)
   } else if (input.eat("[")) {
     type.type = "Array"
