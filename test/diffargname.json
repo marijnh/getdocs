@@ -4,16 +4,26 @@
     "params": [
       {
         "name": "foo",
-        "type": "number"
+        "type": "number",
+        "loc": {
+          "file": "test/diffargname.js",
+          "line": 1,
+          "column": 0
+        }
       },
       {
         "name": "bar",
-        "type": "string"
+        "type": "string",
+        "loc": {
+          "file": "test/diffargname.js",
+          "line": 1,
+          "column": 0
+        }
       }
     ],
-    "file": "test/diffargname.js",
     "loc": {
-      "line": 2,
+      "file": "test/diffargname.js",
+      "line": 1,
       "column": 0
     },
     "kind": "function"

@@ -4,20 +4,35 @@
     "params": [
       {
         "type": "number",
-        "name": "a"
+        "name": "a",
+        "loc": {
+          "file": "test/function.js",
+          "line": 1,
+          "column": 0
+        }
       },
       {
         "type": "number",
-        "name": "b"
+        "name": "b",
+        "loc": {
+          "file": "test/function.js",
+          "line": 1,
+          "column": 0
+        }
       }
     ],
     "returns": {
-      "type": "number"
+      "type": "number",
+      "loc": {
+        "file": "test/function.js",
+        "line": 1,
+        "column": 0
+      }
     },
     "description": "Adds two numbers",
-    "file": "test/function.js",
     "loc": {
-      "line": 3,
+      "file": "test/function.js",
+      "line": 1,
       "column": 0
     },
     "kind": "function"

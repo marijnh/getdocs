@@ -5,18 +5,33 @@
       {
         "type": "Array",
         "content": [{
-          "type": "string"
+          "type": "string",
+          "loc": {
+            "file": "test/restarg.js",
+            "line": 1,
+            "column": 0
+          }
         }],
         "rest": true,
-        "name": "stuff"
+        "name": "stuff",
+        "loc": {
+          "file": "test/restarg.js",
+          "line": 1,
+          "column": 0
+        }
       }
     ],
     "returns": {
-      "type": "bool"
+      "type": "bool",
+      "loc": {
+        "file": "test/restarg.js",
+        "line": 1,
+        "column": 0
+      }
     },
-    "file": "test/restarg.js",
     "loc": {
-      "line": 2,
+      "file": "test/restarg.js",
+      "line": 1,
       "column": 0
     },
     "kind": "function"

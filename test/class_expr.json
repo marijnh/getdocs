@@ -1,9 +1,9 @@
 {
   "Foo": {
     "description": "The Foo class",
-    "file": "test/class_expr.js",
     "loc": {
-      "line": 2,
+      "file": "test/class_expr.js",
+      "line": 1,
       "column": 0
     },
     "kind": "class",
@@ -13,19 +13,33 @@
         "params": [
           {
             "type": "number",
-            "name": "a"
+            "name": "a",
+            "loc": {
+              "file": "test/class_expr.js",
+              "line": 3,
+              "column": 2
+            }
           },
           {
             "type": "string",
-            "name": "b"
+            "name": "b",
+            "loc": {
+              "file": "test/class_expr.js",
+              "line": 3,
+              "column": 2
+            }
           }
         ],
         "returns": {
-          "type": "bool"
-        },
-        "file": "test/class_expr.js",
+          "type": "bool",
+          "loc": {
+            "file": "test/class_expr.js",
+            "line": 3,
+            "column": 2
+          }        },
         "loc": {
-          "line": 4,
+          "file": "test/class_expr.js",
+          "line": 3,
           "column": 2
         },
         "kind": "method"

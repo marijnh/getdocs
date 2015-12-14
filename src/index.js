@@ -118,6 +118,8 @@ function add(items, name, data) {
 function inferParam(n) {
   var param = Object.create(null)
   param.type = "any"
+  param.loc = n.loc.start
+  param.loc.file = n.loc.source.name
   if (n.type == "RestElement") {
     param.rest = true
     n = n.argument
@@ -153,7 +155,7 @@ function inferFn(node, data, kind, name) {
 
   if (ctorName(name)) {
     data.kind = "constructor"
-    return {constructor: data, kind: "class", file: node.loc.source.name, loc: node.loc.start}
+    return {constructor: data, kind: "class", loc: data.loc}
   } else {
     return data
   }

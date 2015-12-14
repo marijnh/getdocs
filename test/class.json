@@ -1,9 +1,9 @@
 {
   "Foo": {
     "description": "The Foo class",
-    "file": "test/class.js",
     "loc": {
-      "line": 2,
+      "file": "test/class.js",
+      "line": 1,
       "column": 0
     },
     "kind": "class",
@@ -13,19 +13,34 @@
         "params": [
           {
             "type": "number",
-            "name": "a"
+            "name": "a",
+            "loc": {
+              "file": "test/class.js",
+              "line": 9,
+              "column": 2
+            }
           },
           {
             "type": "string",
-            "name": "b"
+            "name": "b",
+            "loc": {
+              "file": "test/class.js",
+              "line": 9,
+              "column": 2
+            }
           }
         ],
         "returns": {
-          "type": "bool"
+          "type": "bool",
+          "loc": {
+            "file": "test/class.js",
+            "line": 9,
+            "column": 2
+          }
         },
-        "file": "test/class.js",
         "loc": {
-          "line": 10,
+          "file": "test/class.js",
+          "line": 9,
           "column": 2
         },
         "kind": "method"
@@ -33,9 +48,9 @@
     },
     "extends": "Bar",
     "constructor": {
-      "file": "test/class.js",
       "loc": {
-        "line": 4,
+        "file": "test/class.js",
+        "line": 3,
         "column": 2
       },
       "kind": "constructor",
@@ -43,11 +58,21 @@
       "params": [
         {
           "type": "any",
-          "name": "a"
+          "name": "a",
+          "loc": {
+            "file": "test/class.js",
+            "line": 4,
+            "column": 14
+          }
         },
         {
           "type": "any",
-          "name": "b"
+          "name": "b",
+          "loc": {
+            "file": "test/class.js",
+            "line": 4,
+            "column": 17
+          }
         }
       ]
     }

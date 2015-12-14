@@ -71,7 +71,7 @@ module.exports = function(text, filename, callbacks) {
     if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
       throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
 
-    var data = parseComment(top, strip(comment.text))
+    var data = parseComment(top, strip(comment.text), comment.startLoc)
     if (data.tags && data.tags.forward)
       top.forward = data.tags.forward.split(".")
     else
@@ -103,18 +103,18 @@ function findNodeAfter(ast, pos, types) {
   }
 }
 
-function parseComment(node, text) {
+function parseComment(node, text, loc) {
   var match = /^\s*(;;|::)\s*/.exec(text)
   var data, pos = match[0].length
+  loc.file = node.loc.source.name
   if (match[1] == "::") {
-    var parsed = parseType(text, pos, node.loc)
+    var parsed = parseType(text, pos, loc)
     data = parsed.type
     pos = parsed.end
   } else {
     data = Object.create(null)
+    data.loc = loc
   }
-  data.file = node.loc.source.name
-  data.loc = node.loc.start
   text = text.slice(pos)
   while (match = /^\s*#(\w+)(?:=(\w+|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
     text = text.slice(match[0].length)

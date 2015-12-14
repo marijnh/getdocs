@@ -1,8 +1,8 @@
 {
   "foo": {
-    "file": "test/tags.js",
     "loc": {
-      "line": 3,
+      "file": "test/tags.js",
+      "line": 1,
       "column": 0
     },
     "tags": {

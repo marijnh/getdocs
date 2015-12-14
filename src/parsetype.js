@@ -43,7 +43,7 @@ Input.prototype = {
   },
 
   error: function(message) {
-    throw new SyntaxError(message + " for " + this.loc.source.name + ":" + this.loc.start.line)
+    throw new SyntaxError(message + " for " + this.loc.file + ":" + this.loc.line)
   }
 }
 
@@ -54,6 +54,7 @@ function parse(input) {
     return inner
   }
   var type = Object.create(null)
+  type.loc = input.loc
   if (input.eat("*")) {
     type.type = "any"
   } else if (input.eat("(")) {

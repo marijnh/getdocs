@@ -1,8 +1,8 @@
 {
   "Foo": {
-    "file": "test/class_this.js",
     "loc": {
-      "line": 2,
+      "file": "test/class_this.js",
+      "line": 1,
       "column": 0
     },
     "description": "A Foo",
@@ -12,12 +12,17 @@
       "params": [
         {
           "type": "number",
-          "name": "a"
+          "name": "a",
+          "loc": {
+            "file": "test/class_this.js",
+            "line": 3,
+            "column": 2
+          }
         }
       ],
-      "file": "test/class_this.js",
       "loc": {
-        "line": 4,
+        "file": "test/class_this.js",
+        "line": 3,
         "column": 2
       },
       "kind": "constructor"
@@ -25,18 +30,18 @@
     "instanceProperties": {
       "a": {
         "type": "number",
-        "file": "test/class_this.js",
         "loc": {
-          "line": 7,
+          "file": "test/class_this.js",
+          "line": 5,
           "column": 4
         },
         "description": "The a property"
       },
       "b": {
         "type": "bool",
-        "file": "test/class_this.js",
         "loc": {
-          "line": 15,
+          "file": "test/class_this.js",
+          "line": 13,
           "column": 2
         },
         "description": "The b property"
@@ -44,9 +49,9 @@
       "doStuff": {
         "type": "Function",
         "params": [],
-        "file": "test/class_this.js",
         "loc": {
-          "line": 12,
+          "file": "test/class_this.js",
+          "line": 11,
           "column": 0
         },
         "kind": "function"

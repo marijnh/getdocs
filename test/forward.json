@@ -1,8 +1,8 @@
 {
   "X": {
-    "file": "test/forward.js",
     "loc": {
-      "line": 2,
+      "file": "test/forward.js",
+      "line": 1,
       "column": 0
     },
     "description": "Class X",
@@ -12,11 +12,16 @@
         "type": "Function",
         "params": [],
         "returns": {
-          "type": "string"
+          "type": "string",
+          "loc": {
+            "file": "test/forward.js",
+            "line": 6,
+            "column": 2
+          }
         },
-        "file": "test/forward.js",
         "loc": {
-          "line": 7,
+          "file": "test/forward.js",
+          "line": 6,
           "column": 2
         },
         "kind": "method"

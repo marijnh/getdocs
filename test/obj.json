@@ -3,28 +3,33 @@
     "type": "Object",
     "properties": {
       "extra": {
-        "type": "number"
+        "type": "number",
+        "loc": {
+          "file": "test/obj.js",
+          "line": 1,
+          "column": 0
+        }
       },
       "foo": {
         "description": "A property",
-        "file": "test/obj.js",
         "loc": {
-          "line": 4,
+          "file": "test/obj.js",
+          "line": 3,
           "column": 2
         }
       },
       "baz": {
         "description": "An added property",
-        "file": "test/obj.js",
         "loc": {
-          "line": 9,
+          "file": "test/obj.js",
+          "line": 8,
           "column": 0
         }
       }
     },
-    "file": "test/obj.js",
     "loc": {
-      "line": 2,
+      "file": "test/obj.js",
+      "line": 1,
       "column": 0
     },
     "kind": "let"

@@ -6,12 +6,17 @@
         "type": "bool",
         "default": "false",
         "optional": true,
-        "name": "arg"
+        "name": "arg",
+        "loc": {
+          "file": "test/defaultarg.js",
+          "line": 1,
+          "column": 0
+        }
       }
     ],
-    "file": "test/defaultarg.js",
     "loc": {
-      "line": 2,
+      "file": "test/defaultarg.js",
+      "line": 1,
       "column": 0
     },
     "kind": "function"

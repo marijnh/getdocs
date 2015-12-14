@@ -6,48 +6,103 @@
         "type": "union",
         "content": [
           {
-            "type": "number"
+            "type": "number",
+            "loc": {
+              "file": "test/union.js",
+              "line": 1,
+              "column": 0
+            }
           },
           {
-            "type": "string"
+            "type": "string",
+            "loc": {
+              "file": "test/union.js",
+              "line": 1,
+              "column": 0
+            }
           }
         ],
-        "name": "x"
+        "name": "x",
+        "loc": {
+          "file": "test/union.js",
+          "line": 1,
+          "column": 0
+        }
       },
       {
         "type": "union",
         "content": [
           {
-            "type": "bool"
+            "type": "bool",
+            "loc": {
+              "file": "test/union.js",
+              "line": 1,
+              "column": 0
+            }
           },
           {
-            "type": "RegExp"
+            "type": "RegExp",
+            "loc": {
+              "file": "test/union.js",
+              "line": 1,
+              "column": 0
+            }
           },
           {
             "type": "Array",
+            "loc": {
+              "file": "test/union.js",
+              "line": 1,
+              "column": 0
+            },
             "content": [{
-              "type": "Error"
+              "type": "Error",
+              "loc": {
+                "file": "test/union.js",
+                "line": 1,
+                "column": 0
+              }
             }]
           }
         ],
         "optional": true,
-        "name": "y"
+        "name": "y",
+        "loc": {
+          "file": "test/union.js",
+          "line": 1,
+          "column": 0
+        }
       }
     ],
     "returns": {
       "type": "union",
       "content": [
         {
-          "type": "number"
+          "type": "number",
+          "loc": {
+            "file": "test/union.js",
+            "line": 1,
+            "column": 0
+          }
         },
         {
-          "type": "bool"
+          "type": "bool",
+          "loc": {
+            "file": "test/union.js",
+            "line": 1,
+            "column": 0
+          }
         }
-      ]
+      ],
+      "loc": {
+        "file": "test/union.js",
+        "line": 1,
+        "column": 0
+      }
     },
-    "file": "test/union.js",
     "loc": {
-      "line": 3,
+      "file": "test/union.js",
+      "line": 1,
       "column": 0
     },
     "description": "That's one complex signature",

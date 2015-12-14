@@ -1,9 +1,9 @@
 {
   "Foo": {
     "description": "The Foo class",
-    "file": "test/class_addmethod.js",
     "loc": {
-      "line": 2,
+      "file": "test/class_addmethod.js",
+      "line": 1,
       "column": 0
     },
     "kind": "class",
@@ -13,20 +13,35 @@
         "params": [
           {
             "type": "number",
-            "name": "a"
+            "name": "a",
+            "loc": {
+              "file": "test/class_addmethod.js",
+              "line": 4,
+              "column": 0
+            }
           },
           {
             "type": "string",
-            "name": "b"
+            "name": "b",
+            "loc": {
+              "file": "test/class_addmethod.js",
+              "line": 4,
+              "column": 0
+            }
           }
         ],
         "returns": {
-          "type": "bool"
+          "type": "bool",
+          "loc": {
+            "file": "test/class_addmethod.js",
+            "line": 4,
+            "column": 0
+          }
         },
         "description": "A method",
-        "file": "test/class_addmethod.js",
         "loc": {
-          "line": 6,
+          "file": "test/class_addmethod.js",
+          "line": 4,
           "column": 0
         },
         "kind": "function"

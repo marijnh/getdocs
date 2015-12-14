@@ -3,11 +3,16 @@
     "type": "Function",
     "params": [],
     "returns": {
-      "type": "string"
+      "type": "string",
+      "loc": {
+        "file": "test/exported.js",
+        "line": 1,
+        "column": 0
+      }
     },
-    "file": "test/exported.js",
     "loc": {
-      "line": 2,
+      "file": "test/exported.js",
+      "line": 1,
       "column": 0
     },
     "kind": "function",
@@ -15,9 +20,9 @@
   },
   "x": {
     "type": "number",
-    "file": "test/exported.js",
     "loc": {
-      "line": 5,
+      "file": "test/exported.js",
+      "line": 4,
       "column": 0
     },
     "kind": "var",
@@ -25,9 +30,9 @@
   },
   "default": {
     "type": "string",
-    "file": "test/exported.js",
     "loc": {
-      "line": 8,
+      "file": "test/exported.js",
+      "line": 7,
       "column": 0
     },
     "exported": true
