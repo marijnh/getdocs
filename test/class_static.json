@@ -7,7 +7,14 @@
       "column": 0
     },
     "kind": "class",
-    "extends": "Bar",
+    "extends": {
+      "type": "Bar",
+      "loc": {
+        "line": 2,
+        "column": 18,
+        "file": "test/class_static.js"
+      }
+    },
     "properties": {
       "m": {
         "type": "Function",

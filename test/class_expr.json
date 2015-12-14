@@ -45,6 +45,13 @@
         "kind": "method"
       }
     },
-    "extends": "Bar"
+    "extends": {
+      "type": "Bar",
+      "loc": {
+        "line": 2,
+        "column": 26,
+        "file": "test/class_expr.js"
+      }
+    }
   }
 }

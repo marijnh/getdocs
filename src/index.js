@@ -1,4 +1,5 @@
 var findDocComments = require("./doccomments")
+var parseType = require("./parsetype")
 
 exports.gather = function(text, filename, items) {
   if (!items) items = Object.create(null)
@@ -163,8 +164,11 @@ function inferFn(node, data, kind, name) {
 
 function inferClass(node, data) {
   data.kind = "class"
-  if (node.superClass && node.superClass.type == "Identifier")
-    data.extends = node.superClass.name
+  if (node.superClass && node.superClass.type == "Identifier") {
+    var loc = node.superClass.loc
+    loc.start.file = loc.source.name
+    data.extends = parseType(node.superClass.name, 0, loc.start).type
+  }
   return data
 }
 

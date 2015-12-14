@@ -46,7 +46,14 @@
         "kind": "method"
       }
     },
-    "extends": "Bar",
+    "extends": {
+      "type": "Bar",
+      "loc": {
+        "line": 2,
+        "column": 18,
+        "file": "test/class.js"
+      }
+    },
     "constructor": {
       "loc": {
         "file": "test/class.js",
