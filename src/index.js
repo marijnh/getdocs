@@ -218,9 +218,9 @@ function lvalPos(items, lval, ancestors) {
     path.push(propName(lval))
     lval = lval.object
   }
-  if (!path.length) raise("Could not derive a target for this assignment", lval)
 
   if (lval.type == "Identifier") {
+    if (!path.length) return new Pos(items, lval.name)
     target = deref(items, lval.name)
   } else if (lval.type == "ThisExpression") {
     target = findSelf(items, ancestors.slice(0, ancestors.length - 1))
@@ -260,14 +260,8 @@ function assignedName(node) {
 }
 
 function lvalTarget(items, lval, ancestors) {
-  if (lval.type == "Identifier") {
-    return items[lval.name]
-  } else if (lval.type == "ThisExpression") {
-    return findSelf(items, ancestors.slice(0, ancestors.length - 1))
-  } else if (lval.type == "MemberExpression") {
-    var found = lvalPos(items, lval, ancestors)
-    return deref(found.parent, found.name)
-  }
+  var found = lvalPos(items, lval, ancestors)
+  return deref(found.parent, found.name)
 }
 
 function findPrototype(items, ancestors) {
