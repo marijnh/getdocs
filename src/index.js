@@ -1,10 +1,46 @@
-var findDocComments = require("./doccomments")
+var docComments = require("./doccomments")
 var parseType = require("./parsetype")
 
 exports.gather = function(text, filename, items) {
   if (!items) items = Object.create(null)
 
-  var ast = findDocComments(text, filename, {
+  var found = docComments.parse(text, filename)
+
+  var findPos = findPosFor(items)
+
+  found.comments.forEach(function(comment) {
+    var stack = docComments.findNodeAfter(found.ast, comment.end, findPos)
+    var top = stack && stack[stack.length - 1]
+    if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
+      throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
+
+    var data = comment.data
+    if (data.tags && data.tags.forward) {
+      top.forward = data.tags.forward.split(".")
+    } else {
+      var pos = findPos[top.type](top, stack)
+      if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)
+      pos.add(data)
+    }
+  })
+
+  // Mark locals exported with `export {a, b, c}` statements as exported
+  for (var i = 0; i < found.ast.body.length; i++) {
+    var node = found.ast.body[i]
+    if (node.type == "ExportNamedDeclaration" && !node.source) {
+      for (var j = 0; j < node.specifiers.length; j++) {
+        var spec = node.specifiers[j]
+        var known = items[spec.local.name]
+        if (known) known.exported = true
+      }
+    }
+  }
+
+  return items
+}
+
+function findPosFor(items) {
+  return {
     // FIXME destructuring
     VariableDeclaration: function(node) { return new Pos(items, node.declarations[0].id.name) },
 
@@ -37,70 +73,58 @@ exports.gather = function(text, filename, items) {
     ExportDefaultDeclaration: function() {
       return new Pos(items, "default")
     }
-  }, {
-    VariableDeclaration: function(node, data) {
-      var decl0 = node.declarations[0]
-      return inferExpr(decl0.init, data, node.kind, decl0.id.name)
-    },
-
-    VariableDeclarator: function(node, data, ancestors) {
-      var kind = ancestors[ancestors.length - 2].kind
-      return inferExpr(node.init, data, kind, node.id.name)
-    },
-
-    FunctionDeclaration: function(node, data) {
-      return inferFn(node, data, "function", node.id.name)
-    },
-
-    ClassDeclaration: function(node, data) {
-      return inferClass(node, data)
-    },
-
-    AssignmentExpression: function(node, data) {
-      return inferExpr(node.right, data, null, propName(node.left))
-    },
-
-    Property: function(node, data) {
-      return inferExpr(node.value, data, null, propName(node, true))
-    },
-
-    MethodDefinition: function(node, data) {
-      var kind = node.kind
-      if (kind == "get") kind = "getter"
-      else if (kind == "set") kind = "setter"
-      return inferFn(node.value, data, kind)
-    },
-
-    ExportNamedDeclaration: function(node, data, ancestors) {
-      var inner = this[node.declaration.type](node.declaration, data, ancestors)
-      inner.exported = true
-      return inner
-    },
-
-    ExportDefaultDeclaration: function(node, data, ancestors) {
-      var decl = node.declaration
-      if (this[decl.type])
-        data = this[decl.type](decl, data, ancestors)
-      else
-        data = inferExpr(decl, data)
-      data.exported = true
-      return data
-    }
-  })
-
-  // Mark locals exported with `export {a, b, c}` statements as exported
-  for (var i = 0; i < ast.body.length; i++) {
-    var node = ast.body[i]
-    if (node.type == "ExportNamedDeclaration" && !node.source) {
-      for (var j = 0; j < node.specifiers.length; j++) {
-        var spec = node.specifiers[j]
-        var known = items[spec.local.name]
-        if (known) known.exported = true
-      }
-    }
   }
+}
 
-  return items
+var inferForNode = {
+  VariableDeclaration: function(node, data) {
+    var decl0 = node.declarations[0]
+    return inferExpr(decl0.init, data, node.kind, decl0.id.name)
+  },
+
+  VariableDeclarator: function(node, data, ancestors) {
+    var kind = ancestors[ancestors.length - 2].kind
+    return inferExpr(node.init, data, kind, node.id.name)
+  },
+
+  FunctionDeclaration: function(node, data) {
+    return inferFn(node, data, "function", node.id.name)
+  },
+
+  ClassDeclaration: function(node, data) {
+    return inferClass(node, data)
+  },
+
+  AssignmentExpression: function(node, data) {
+    return inferExpr(node.right, data, null, propName(node.left))
+  },
+
+  Property: function(node, data) {
+    return inferExpr(node.value, data, null, propName(node, true))
+  },
+
+  MethodDefinition: function(node, data) {
+    var kind = node.kind
+    if (kind == "get") kind = "getter"
+    else if (kind == "set") kind = "setter"
+    return inferFn(node.value, data, kind)
+  },
+
+  ExportNamedDeclaration: function(node, data, ancestors) {
+    var inner = this[node.declaration.type](node.declaration, data, ancestors)
+    inner.exported = true
+    return inner
+  },
+
+  ExportDefaultDeclaration: function(node, data, ancestors) {
+    var decl = node.declaration
+    if (this[decl.type])
+      data = this[decl.type](decl, data, ancestors)
+    else
+      data = inferExpr(decl, data)
+    data.exported = true
+    return data
+  }
 }
 
 function raise(msg, node) {

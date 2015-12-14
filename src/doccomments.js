@@ -41,7 +41,7 @@ function strip(lines) {
   return lines.join("\n")
 }
 
-module.exports = function(text, filename, findPos, infer) {
+exports.parse = function(text, filename) {
   var current = null, found = []
 
   var ast = acorn.parse(text, {
@@ -65,28 +65,16 @@ module.exports = function(text, filename, findPos, infer) {
   })
 
   for (var i = 0; i < found.length; i++) {
-    var comment = found[i]
-    var stack = findNodeAfter(ast, comment.end, findPos)
-    var top = stack && stack[stack.length - 1]
-    if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
-      throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
-
-    var data = parseComment(top, strip(comment.text), comment.startLoc)
-    if (data.tags && data.tags.forward) {
-      top.forward = data.tags.forward.split(".")
-    } else {
-      var pos = findPos[top.type](top, stack)
-      if (infer.hasOwnProperty(top.type)) data = infer[top.type](top, data, stack)
-      pos.add(data)
-    }
+    var comment = found[i], loc = comment.startLoc
+    loc.file = filename
+    comment.data = parseComment(strip(comment.text), comment.startLoc)
   }
-
-  return ast
+  return {ast: ast, comments: found}
 }
 
 function Found() {}
 
-function findNodeAfter(ast, pos, types) {
+exports.findNodeAfter = function(ast, pos, types) {
   var stack = []
   function c(node, _, override) {
     if (node.end < pos) return
@@ -106,10 +94,9 @@ function findNodeAfter(ast, pos, types) {
   }
 }
 
-function parseComment(node, text, loc) {
+function parseComment(text, loc) {
   var match = /^\s*(;;|::)\s*/.exec(text)
   var data, pos = match[0].length
-  loc.file = node.loc.source.name
   if (match[1] == "::") {
     var parsed = parseType(text, pos, loc)
     data = parsed.type
