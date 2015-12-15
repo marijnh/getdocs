@@ -233,7 +233,10 @@ function extend(from, to, path) {
     } else if (prop == "properties" || prop == "instanceProperties") {
       extend(from[prop], to[prop], path + "." + prop)
     } else {
-      throw new SyntaxError("Conflicting information for " + path + "." + prop)
+      var msg = "Conflicting information for " + path + "." + prop
+      if (to.loc) msg += " at " + to.loc.file + ":" + to.loc.line
+      if (from.loc) msg += (to.loc ? " and " : " at ") + from.loc.file + ":" + from.loc.line
+      throw new SyntaxError(msg)
     }
   }
   return to
