@@ -9,14 +9,26 @@ exports.gather = function(text, filename, items) {
   var findPos = findPosFor(items)
 
   found.comments.forEach(function(comment) {
+    var data = comment.data
+    if (data.tags && data.tags.path) {
+      var path = splitPath(data.tags.path)
+      posFromPath(items, path).add(data)
+      if (!data.kind && data.type) {
+        if (data.type == "Function")
+          data.kind = path.length > 1 ? "method" : "function"
+        else
+          data.kind = path.length > 1 ? "property" : "const"
+      }
+      return
+    }
+
     var stack = docComments.findNodeAfter(found.ast, comment.end, findPos)
     var top = stack && stack[stack.length - 1]
     if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
       throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
 
-    var data = comment.data
     if (data.tags && data.tags.forward) {
-      top.forward = data.tags.forward.split(".")
+      top.forward = splitPath(data.tags.forward)
     } else {
       var pos = findPos[top.type](top, stack)
       if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)
@@ -232,6 +244,10 @@ Pos.prototype.add = function(data) {
   return known ? extend(data, known, this.name) : this.parent[this.name] = data
 }
 
+Pos.prototype.deref = function() {
+  return this.parent[this.name] || (this.parent[this.name] = Object.create(null))
+}
+
 function deref(obj, name) {
   return obj[name] || (obj[name] = Object.create(null))
 }
@@ -271,7 +287,7 @@ function findAssigned(items, ancestors) {
   if (top.type == "VariableDeclarator" && top.id.type == "Identifier")
     return deref(items, top.id.name)
   else if (top.type == "AssignmentExpression")
-    return lvalTarget(items, top.left, ancestors)
+    return lvalPos(items, top.left, ancestors).deref()
   else
     raise("Could not derive a name", top)
 }
@@ -283,18 +299,13 @@ function assignedName(node) {
     return propName(node.left)
 }
 
-function lvalTarget(items, lval, ancestors) {
-  var found = lvalPos(items, lval, ancestors)
-  return deref(found.parent, found.name)
-}
-
 function findPrototype(items, ancestors) {
   var assign = ancestors[ancestors.length - 1]
   if (assign.type != "AssignmentExpression") return null
   for (var i = 0, lval = assign.left; i < 2; i++) {
     if (lval.type != "MemberExpression" || lval.computed) return null
     if (lval.property.name == "prototype")
-      return lvalTarget(items, lval.object, ancestors)
+      return lvalPos(items, lval.object, ancestors).deref()
     lval = lval.object
   }
 }
@@ -302,7 +313,7 @@ function findPrototype(items, ancestors) {
 function findSelf(items, ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
     var forward = i && ancestors[i - 1].forward
-    if (forward) return fromPath(items, forward)
+    if (forward) return posFromPath(items, forward).deref()
 
     var ancestor = ancestors[i], found
     if (ancestor.type == "ClassDeclaration")
@@ -322,7 +333,7 @@ function findSelf(items, ancestors) {
 function findParent(items, ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
     var forward = i && ancestors[i - 1].forward
-    if (forward) return fromPath(items, forward)
+    if (forward) return posFromPath(items, forward).deref()
 
     var ancestor = ancestors[i]
     if (ancestor.type == "ClassDeclaration")
@@ -332,9 +343,26 @@ function findParent(items, ancestors) {
   }
 }
 
-function fromPath(items, path) {
+function posFromPath(items, path) {
   var target = items
-  for (var i = 0; i < path.length; i++)
-    target = deref(i ? deref(target, "properties") : target, path[i])
-  return target
+  for (var i = 0; i < path.length - 1; i++) {
+    var name = path[i], descend = "properties"
+    if (i < path.length - 2 && path[i + 1] == "prototype") {
+      descend = "instanceProperties"
+      i++
+    }
+    target = deref(deref(target, name), descend)
+  }
+  return new Pos(target, path[path.length - 1])
+}
+
+function splitPath(path) {
+  var m, parts = [], rest = path
+  while (rest && (m = /^([.*]|[\w$]+)(\.)?/.exec(rest))) {
+    parts.push(m[1])
+    rest = rest.slice(m[0].length)
+    if (!m[2]) break
+  }
+  if (rest) throw new Error("Invalid path: " + path)
+  return parts
 }

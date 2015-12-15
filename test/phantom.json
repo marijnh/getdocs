@@ -1,0 +1,61 @@
+{
+  "Abc": {
+    "loc": {
+      "line": 1,
+      "column": 0,
+      "file": "test/phantom.js"
+    },
+    "kind": "class",
+    "tags": {
+      "path": "Abc"
+    },
+    "description": "The Abc class",
+    "instanceProperties": {
+      "m1": {
+        "kind": "method",
+        "loc": {
+          "line": 4,
+          "column": 0,
+          "file": "test/phantom.js"
+        },
+        "type": "Function",
+        "params": [
+          {
+            "loc": {
+              "line": 4,
+              "column": 0,
+              "file": "test/phantom.js"
+            },
+            "type": "number",
+            "name": "a"
+          }
+        ],
+        "returns": {
+          "loc": {
+            "line": 4,
+            "column": 0,
+            "file": "test/phantom.js"
+          },
+          "type": "number"
+        },
+        "tags": {
+          "path": "Abc.prototype.m1"
+        },
+        "description": "Method #1"
+      }
+    }
+  },
+  "myString": {
+    "kind": "const",
+    "loc": {
+      "line": 8,
+      "column": 0,
+      "file": "test/phantom.js"
+    },
+    "type": "string",
+    "tags": {
+      "path": "myString"
+    },
+    "description": "My string"
+  }
+}

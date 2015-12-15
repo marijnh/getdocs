@@ -94,6 +94,8 @@ exports.findNodeAfter = function(ast, pos, types) {
   }
 }
 
+var directTags = {kind: true}
+
 function parseComment(text, loc) {
   var match = /^\s*(;;|::)\s*/.exec(text)
   var data, pos = match[0].length
@@ -106,11 +108,15 @@ function parseComment(text, loc) {
     data.loc = loc
   }
   text = text.slice(pos)
-  while (match = /^\s*#(\w+)(?:=(\w+|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
+  while (match = /^\s*#([\w$]+)(?:=([\w\.$]+|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
     text = text.slice(match[0].length)
     var value = match[2] || "true"
     if (value.charAt(0) == '"') value = JSON.parse(value)
-    ;(data.tags || (data.tags = Object.create(null)))[match[1]] = value
+    if (directTags.hasOwnProperty(match[1])) {
+      data[match[1]] = value
+    } else {
+      ;(data.tags || (data.tags = Object.create(null)))[match[1]] = value
+    }
   }
   if (/\S/.test(text)) data.description = text
   return data

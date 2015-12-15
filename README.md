@@ -110,6 +110,14 @@ string. For example `#chapter=selection` or `#added="2.1.0"`.
 
 These tags have a special meaning that is interpreted by getdocs:
 
+ * **path**: Prevents the comment from being associated with the
+   program element after it, and puts it in the namespace under the
+   given path instead, which should be something like `name` or
+   `Foo.prototype.methodName`.
+
+ * **kind**: Explicitly sets the kind of this item. Is stored directly
+   on the item data, rather than under a `tags` object.
+
  * **forward**: Can be used to make the properties or methods of a
    class or object appear in another class or object. A typical use
    case is moving documentation from a private subclass into a public
