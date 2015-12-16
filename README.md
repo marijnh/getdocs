@@ -114,7 +114,10 @@ These tags have a special meaning that is interpreted by getdocs:
  * **path**: Prevents the comment from being associated with the
    program element after it, and puts it in the namespace under the
    given path instead, which should be something like `name` or
-   `Foo.prototype.methodName`.
+   `Foo.prototype.methodName`. You can also separate elements with a
+   `#` to indicate a direct property (rather than going through
+   `.properties`) in the output—for example `Foo#constructor` to set
+   the constructor property of a class.
 
  * **kind**: Explicitly sets the kind of this item. Is stored directly
    on the item data, rather than under a `tags` object.

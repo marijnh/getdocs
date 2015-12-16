@@ -1,7 +1,7 @@
 {
   "name": "getdocs",
-  "version": "0.0.1",
-  "description": "Getdocs is not JSDoc",
+  "version": "0.1.0",
+  "description": "An extractor for succinct documentation comments in JavaScript code",
   "main": "src/index.js",
   "scripts": {
     "test": "node test/run.js"
@@ -26,7 +26,7 @@
     "url": "https://github.com/marijnh/getdocs/issues"
   },
   "dependencies": {
-    "acorn": "^2.6.4",
+    "acorn": "^2.6.0",
     "glob": "^6.0.1"
   }
 }
