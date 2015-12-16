@@ -347,24 +347,31 @@ function findParent(items, ancestors) {
 }
 
 function posFromPath(items, path) {
-  var target = items
+  var target = items, next = path[0]
   for (var i = 0; i < path.length - 1; i++) {
-    var name = path[i], descend = "properties"
-    if (i < path.length - 2 && path[i + 1] == "prototype") {
+    var name = next, descend = "properties"
+    next = path[i + 1]
+    if (i < path.length - 2 && next == "prototype") {
       descend = "instanceProperties"
       i++
+      next = path[i + 1]
+    } else if (next[0] == "#") {
+      descend = null
+      next = next.slice(1)
     }
-    target = deref(deref(target, name), descend)
+    target = deref(target, name)
+    if (descend) target = deref(target, descend)
   }
-  return new Pos(target, path[path.length - 1])
+  return new Pos(target, next)
 }
 
 function splitPath(path) {
-  var m, parts = [], rest = path
-  while (rest && (m = /^([.*]|[\w$]+)(\.)?/.exec(rest))) {
-    parts.push(m[1])
+  var m, parts = [], rest = path, pound = ""
+  while (rest && (m = /^(\[.*?\]|[\w$]+)(\.|#)?/.exec(rest))) {
+    parts.push(pound + m[1])
     rest = rest.slice(m[0].length)
     if (!m[2]) break
+    pound = m[2] == "#" ? "#" : ""
   }
   if (rest) throw new Error("Invalid path: " + path)
   return parts

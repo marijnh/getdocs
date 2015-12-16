@@ -1,0 +1,38 @@
+{
+  "Boo": {
+    "loc": {
+      "line": 1,
+      "column": 0,
+      "file": "test/hashpath.js"
+    },
+    "description": "Boo the class",
+    "kind": "class",
+    "event": {
+      "properties": {
+        "start": {
+          "loc": {
+            "line": 4,
+            "column": 0,
+            "file": "test/hashpath.js"
+          },
+          "type": "Function",
+          "params": [
+            {
+              "loc": {
+                "line": 4,
+                "column": 0,
+                "file": "test/hashpath.js"
+              },
+              "type": "number"
+            }
+          ],
+          "tags": {
+            "path": "Boo#event.start"
+          },
+          "kind": "event",
+          "description": "Start event"
+        }
+      }
+    }
+  }
+}

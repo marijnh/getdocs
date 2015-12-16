@@ -105,8 +105,9 @@ A tag like `#deprecated`, for example, will result in a `tags:
 {deprecated: "true"}` property on the given item.
 
 You can give tags an explicit value other than `"true"` by writing an
-`=` character followed either by a word or a quoted JavaScript-style
-string. For example `#chapter=selection` or `#added="2.1.0"`.
+`=` character followed either by a word (a sequence of characters
+without whitespace) or a quoted JavaScript-style string. For example
+`#chapter=selection` or `#added="2.1.0"`.
 
 These tags have a special meaning that is interpreted by getdocs:
 

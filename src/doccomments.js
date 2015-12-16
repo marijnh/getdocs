@@ -108,7 +108,7 @@ function parseComment(text, loc) {
     data.loc = loc
   }
   text = text.slice(pos)
-  while (match = /^\s*#([\w$]+)(?:=([\w\.$]+|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
+  while (match = /^\s*#([\w$]+)(?:=([^"]\S*|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
     text = text.slice(match[0].length)
     var value = match[2] || "true"
     if (value.charAt(0) == '"') value = JSON.parse(value)
