@@ -63,9 +63,11 @@ A type can be:
 
  * A JavaScript identifier, optionally followed by any number of
    properties, which are a dot character followed by a JavaScript
-   identifier.
+   identifier. A type name can be followed by a list of content types,
+   between angle brackets, as in `Object<string>`.
 
- * An array type, which is a type wrapped in `[` and `]`.
+ * An array type, which is a type wrapped in `[` and `]`. `[x]` is
+   equivalent to `Array<x>`.
 
  * A function type, which is written as a parenthesized list of
    argument types. Each argument type may optionally be prefixed with
@@ -143,9 +145,7 @@ item:
    `function`, `var`, `let`, `const`, `class`, `constructor`,
    `method`, `getter`, or `setter`.
 
- * **file**: The filename where the item was found.
-
- * **loc**: A `{line, column}` object pointing at the start of the item.
+ * **loc**: A `{line, column, file}` object pointing at the start of the item.
 
  * **exported**: Set if the item is exported.
 
@@ -181,7 +181,7 @@ nested types:
 
  * **properties**: An object mapping property names to types.
 
- * **content**: For array types, this holds the type of the array's
-   elements.
+ * **content**: For array types or named types with content (angle
+   brackets) specification, this holds an array of content types.
 
  * **optional**: Set for nullable types.
