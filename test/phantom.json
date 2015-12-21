@@ -6,9 +6,7 @@
       "file": "test/phantom.js"
     },
     "kind": "class",
-    "tags": {
-      "path": "Abc"
-    },
+    "$path": "Abc",
     "description": "The Abc class",
     "instanceProperties": {
       "m1": {
@@ -38,9 +36,7 @@
           },
           "type": "number"
         },
-        "tags": {
-          "path": "Abc.prototype.m1"
-        },
+        "$path": "Abc.prototype.m1",
         "description": "Method #1"
       }
     }
@@ -53,9 +49,7 @@
       "file": "test/phantom.js"
     },
     "type": "string",
-    "tags": {
-      "path": "myString"
-    },
+    "$path": "myString",
     "description": "My string"
   }
 }

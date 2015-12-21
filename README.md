@@ -101,8 +101,9 @@ prefixed with a `#` character, appearing at the start of the comment —
 that is, immediately after the `;;` for a type-less comment, or
 immediately after the type for a typed one.
 
-A tag like `#deprecated`, for example, will result in a `tags:
-{deprecated: "true"}` property on the given item.
+A tag like `#deprecated`, for example, will result in a `$deprecated:
+"true"` property on the given item. The property is named by
+prepending the tag's name with a dollar sign.
 
 You can give tags an explicit value other than `"true"` by writing an
 `=` character followed either by a word (a sequence of characters
@@ -119,8 +120,8 @@ These tags have a special meaning that is interpreted by getdocs:
    `.properties`) in the output—for example `Foo#constructor` to set
    the constructor property of a class.
 
- * **kind**: Explicitly sets the kind of this item. Is stored directly
-   on the item data, rather than under a `tags` object.
+ * **kind**: Explicitly sets the kind of this item. Does not get a
+   dollar sign prefix.
 
  * **forward**: Can be used to make the properties or methods of a
    class or object appear in another class or object. A typical use

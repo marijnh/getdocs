@@ -10,8 +10,8 @@ exports.gather = function(text, filename, items) {
 
   found.comments.forEach(function(comment) {
     var data = comment.data
-    if (data.tags && data.tags.path) {
-      var path = splitPath(data.tags.path)
+    if (data.$path) {
+      var path = splitPath(data.$path)
       posFromPath(items, path).add(data)
       if (!data.kind && data.type) {
         if (data.type == "Function")
@@ -27,8 +27,8 @@ exports.gather = function(text, filename, items) {
     if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
       throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
 
-    if (data.tags && data.tags.forward) {
-      top.forward = splitPath(data.tags.forward)
+    if (data.$forward) {
+      top.forward = splitPath(data.$forward)
     } else {
       var pos = findPos[top.type](top, stack)
       if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)

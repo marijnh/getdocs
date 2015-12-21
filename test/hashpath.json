@@ -26,9 +26,7 @@
               "type": "number"
             }
           ],
-          "tags": {
-            "path": "Boo#event.start"
-          },
+          "$path": "Boo#event.start",
           "kind": "event",
           "description": "Start event"
         }

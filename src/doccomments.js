@@ -112,11 +112,7 @@ function parseComment(text, loc) {
     text = text.slice(match[0].length)
     var value = match[2] || "true"
     if (value.charAt(0) == '"') value = JSON.parse(value)
-    if (directTags.hasOwnProperty(match[1])) {
-      data[match[1]] = value
-    } else {
-      ;(data.tags || (data.tags = Object.create(null)))[match[1]] = value
-    }
+    data[directTags.hasOwnProperty(match[1]) ? match[1] : "$" + match[1]] = value
   }
   if (/\S/.test(text)) data.description = text
   return data
