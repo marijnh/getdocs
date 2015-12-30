@@ -367,7 +367,7 @@ function posFromPath(items, path) {
 
 function splitPath(path) {
   var m, parts = [], rest = path, pound = ""
-  while (rest && (m = /^(\[.*?\]|[\w$]+)(\.|#)?/.exec(rest))) {
+  while (rest && (m = /^(\[.*?\]|[^\s\.#]+)(\.|#)?/.exec(rest))) {
     parts.push(pound + m[1])
     rest = rest.slice(m[0].length)
     if (!m[2]) break
