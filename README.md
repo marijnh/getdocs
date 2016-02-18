@@ -84,6 +84,8 @@ A type can be:
    `}` braces. Each property must start with an identifier, followed
    by a comma, followed by a type.
 
+ * A string literal, enclosed by double quotes.
+
 Here are some examples of types:
 
  * `Math.pow`: `(base: number, exponent: number) → number`
@@ -95,6 +97,8 @@ Here are some examples of types:
  * A pair of coordinates: `{x: number, y: number}`
 
  * An array of strings: `[string]`
+
+ * An array of `CommandSpec`s or the string "schema": `union<[CommandSpec], "schema">`
 
 ## Tags
 

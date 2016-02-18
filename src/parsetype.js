@@ -90,6 +90,7 @@ function parse(input) {
     }
   } else {
     var name = input.match(/^[\w$]+(?:\.[\w$]+)*/)
+    if (!name) name = input.match(/"(?:[^"]|\")*"/)
     if (!name) input.error("Unexpected syntax: " + input.str.slice(input.pos, input.pos + 5))
     type.type = name[0]
     if (input.eat("<")) {
