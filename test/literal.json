@@ -1,0 +1,67 @@
+{
+  "add": {
+    "loc": {
+      "line": 1,
+      "column": 0,
+      "file": "test/literal.js"
+    },
+    "type": "Function",
+    "params": [
+      {
+        "loc": {
+          "line": 1,
+          "column": 0,
+          "file": "test/literal.js"
+        },
+        "type": "union",
+        "content": [
+          {
+            "loc": {
+              "line": 1,
+              "column": 0,
+              "file": "test/literal.js"
+            },
+            "type": "\"a\""
+          },
+          {
+            "loc": {
+              "line": 1,
+              "column": 0,
+              "file": "test/literal.js"
+            },
+            "type": "\"b\""
+          }
+        ],
+        "name": "which"
+      },
+      {
+        "loc": {
+          "line": 1,
+          "column": 0,
+          "file": "test/literal.js"
+        },
+        "type": "number",
+        "name": "a"
+      },
+      {
+        "loc": {
+          "line": 1,
+          "column": 0,
+          "file": "test/literal.js"
+        },
+        "type": "number",
+        "name": "b"
+      }
+    ],
+    "returns": {
+      "loc": {
+        "line": 1,
+        "column": 0,
+        "file": "test/literal.js"
+      },
+      "type": "number"
+    },
+    "description": "Returns a or b",
+    "kind": "function"
+  }
+}
