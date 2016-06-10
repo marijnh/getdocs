@@ -5,12 +5,10 @@
       "column": 0,
       "file": "test/phantom.js"
     },
-    "kind": "class",
-    "$path": "Abc",
     "description": "The Abc class",
+    "type": "class",
     "instanceProperties": {
       "m1": {
-        "kind": "method",
         "loc": {
           "line": 4,
           "column": 0,
@@ -36,20 +34,17 @@
           },
           "type": "number"
         },
-        "$path": "Abc.prototype.m1",
         "description": "Method #1"
       }
     }
   },
   "myString": {
-    "kind": "const",
     "loc": {
-      "line": 8,
+      "line": 7,
       "column": 0,
       "file": "test/phantom.js"
     },
     "type": "string",
-    "$path": "myString",
     "description": "My string"
   }
 }

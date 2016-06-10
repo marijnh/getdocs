@@ -27,10 +27,9 @@
         "line": 1,
         "column": 0
       },
-      "description": "A vector type",
-      "kind": "constructor"
+      "description": "A vector type"
     },
-    "kind": "class",
+    "type": "class",
     "loc": {
       "file": "test/class_ctor.js",
       "line": 1,

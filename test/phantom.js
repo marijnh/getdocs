@@ -1,10 +1,8 @@
-// ;; #kind=class #path=Abc
+// :: Abc: class
 // The Abc class
 
-// :: (a: number) → number
-// #path=Abc.prototype.m1
+// :: Abc.prototype.m1: (a: number) → number
 // Method #1
 
-// :: string
-// #path=myString
+// :: myString: string
 // My string

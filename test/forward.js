@@ -1,7 +1,7 @@
-// ;; Class X
+// :: class Class X
 class X {}
 
-// ;; #forward=X
+// :: class #forward=X
 class Y {
   // :: () → string
   foo() {}

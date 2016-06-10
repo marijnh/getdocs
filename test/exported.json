@@ -15,7 +15,6 @@
       "line": 1,
       "column": 0
     },
-    "kind": "function",
     "exported": true
   },
   "x": {
@@ -25,7 +24,6 @@
       "line": 4,
       "column": 0
     },
-    "kind": "var",
     "exported": true
   },
   "default": {

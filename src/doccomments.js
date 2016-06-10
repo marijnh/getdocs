@@ -50,7 +50,7 @@ exports.parse = function(text, filename) {
     sourceFile: {text: text, name: filename},
     sourceType: "module",
     onComment: function(block, text, start, end, startLoc, endLoc) {
-      if (/^\s*(?:::|;;)/.test(text)) {
+      if (/^\s*::/.test(text)) {
         var obj = {text: text.split("\n"), start: start, end: end, startLoc: startLoc, endLoc: endLoc}
         found.push(obj)
         if (!block) current = obj
@@ -67,7 +67,9 @@ exports.parse = function(text, filename) {
   for (var i = 0; i < found.length; i++) {
     var comment = found[i], loc = comment.startLoc
     loc.file = filename
-    comment.data = parseComment(strip(comment.text), comment.startLoc)
+    let parsed = parseComment(strip(comment.text), comment.startLoc)
+    comment.data = parsed.data
+    comment.name = parsed.name
   }
   return {ast: ast, comments: found}
 }
@@ -94,26 +96,33 @@ exports.findNodeAfter = function(ast, pos, types) {
   }
 }
 
-var directTags = {kind: true}
+exports.findNodeAround = function(ast, pos, types) {
+  var stack = [], found
+  function c(node, _, override) {
+    if (node.end <= pos || node.start >= pos) return
+    if (!override) stack.push(node)
+    walk.base[override || node.type](node, null, c)
+    if (types[node.type] && !found) found = stack.slice()
+    if (!override) stack.pop()
+  }
+  c(ast)
+  return found || stack
+}
 
 function parseComment(text, loc) {
-  var match = /^\s*(;;|::)\s*/.exec(text)
-  var data, pos = match[0].length
-  if (match[1] == "::") {
-    var parsed = parseType(text, pos, loc)
-    data = parsed.type
-    pos = parsed.end
-  } else {
-    data = Object.create(null)
-    data.loc = loc
-  }
-  text = text.slice(pos)
+  var match = /^\s*::\s*/.exec(text)
+  var pos = match[0].length
+  var nameMatch = /^([\w\.$]+):/.exec(text.slice(pos))
+  var parsed = parseType(text, pos + (nameMatch ? nameMatch[0].length : 0), loc)
+  var data = parsed.type
+
+  text = text.slice(parsed.end)
   while (match = /^\s*#([\w$]+)(?:=([^"]\S*|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
     text = text.slice(match[0].length)
     var value = match[2] || "true"
     if (value.charAt(0) == '"') value = JSON.parse(value)
-    data[directTags.hasOwnProperty(match[1]) ? match[1] : "$" + match[1]] = value
+    data["$" + match[1]] = value
   }
   if (/\S/.test(text)) data.description = text
-  return data
+  return {data: data, name: nameMatch && nameMatch[1]}
 }

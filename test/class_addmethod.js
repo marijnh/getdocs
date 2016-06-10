@@ -1,4 +1,4 @@
-// ;; The Foo class
+// :: class The Foo class
 class Foo {}
 
 // :: (number, string) → bool

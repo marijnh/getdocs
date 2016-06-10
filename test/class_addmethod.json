@@ -1,12 +1,12 @@
 {
   "Foo": {
     "description": "The Foo class",
+    "type": "class",
     "loc": {
       "file": "test/class_addmethod.js",
       "line": 1,
       "column": 0
     },
-    "kind": "class",
     "instanceProperties": {
       "bar": {
         "type": "Function",
@@ -43,8 +43,7 @@
           "file": "test/class_addmethod.js",
           "line": 4,
           "column": 0
-        },
-        "kind": "function"
+        }
       }
     }
   }

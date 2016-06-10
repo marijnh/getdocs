@@ -6,7 +6,7 @@
       "column": 0
     },
     "description": "A Foo",
-    "kind": "class",
+    "type": "class",
     "constructor": {
       "type": "Function",
       "params": [
@@ -24,8 +24,7 @@
         "file": "test/class_this.js",
         "line": 3,
         "column": 2
-      },
-      "kind": "constructor"
+      }
     },
     "instanceProperties": {
       "a": {
@@ -53,8 +52,7 @@
           "file": "test/class_this.js",
           "line": 11,
           "column": 0
-        },
-        "kind": "function"
+        }
       }
     }
   }

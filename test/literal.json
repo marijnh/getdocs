@@ -61,7 +61,6 @@
       },
       "type": "number"
     },
-    "description": "Returns a or b",
-    "kind": "function"
+    "description": "Returns a or b"
   }
 }

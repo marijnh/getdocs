@@ -25,7 +25,7 @@ function hop(obj, prop) {
 
 function compare(a, b, path) {
   if (typeof a != "object" || typeof b != "object") {
-    if (a !== b) throw new Error("Mismatch at " + path)
+    if (a !== b) throw new Error("Mismatch at " + path + ": " + a + " vs " + b)
   } else {
     for (var prop in a) if (hop(a, prop)) {
       if (!(prop in b))

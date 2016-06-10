@@ -9,7 +9,6 @@
     "$exported": "false",
     "$context": "a \"string\"",
     "description": "Hello!",
-    "kind": "function",
     "type": "Function",
     "params": []
   }

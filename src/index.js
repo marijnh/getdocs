@@ -10,15 +10,9 @@ exports.gather = function(text, filename, items) {
 
   found.comments.forEach(function(comment) {
     var data = comment.data
-    if (data.$path) {
-      var path = splitPath(data.$path)
-      posFromPath(items, path).add(data)
-      if (!data.kind && data.type) {
-        if (data.type == "Function")
-          data.kind = path.length > 1 ? "method" : "function"
-        else
-          data.kind = path.length > 1 ? "property" : "const"
-      }
+    if (comment.name) {
+      var stack = docComments.findNodeAround(found.ast, comment.end, findPos)
+      posFromPath(findParent(items, stack) || items, splitPath(comment.name)).add(data)
       return
     }
 
@@ -91,16 +85,15 @@ function findPosFor(items) {
 var inferForNode = {
   VariableDeclaration: function(node, data) {
     var decl0 = node.declarations[0]
-    return inferExpr(decl0.init, data, node.kind, decl0.id.name)
+    return inferExpr(decl0.init, data, decl0.id.name)
   },
 
   VariableDeclarator: function(node, data, ancestors) {
-    var kind = ancestors[ancestors.length - 2].kind
-    return inferExpr(node.init, data, kind, node.id.name)
+    return inferExpr(node.init, data, node.id.name)
   },
 
   FunctionDeclaration: function(node, data) {
-    return inferFn(node, data, "function", node.id.name)
+    return inferFn(node, data, node.id.name)
   },
 
   ClassDeclaration: function(node, data) {
@@ -108,18 +101,15 @@ var inferForNode = {
   },
 
   AssignmentExpression: function(node, data) {
-    return inferExpr(node.right, data, null, propName(node.left))
+    return inferExpr(node.right, data, propName(node.left))
   },
 
   Property: function(node, data) {
-    return inferExpr(node.value, data, null, propName(node, true))
+    return inferExpr(node.value, data, propName(node, true))
   },
 
   MethodDefinition: function(node, data) {
-    var kind = node.kind
-    if (kind == "get") kind = "getter"
-    else if (kind == "set") kind = "setter"
-    return inferFn(node.value, data, kind)
+    return inferFn(node.value, data)
   },
 
   ExportNamedDeclaration: function(node, data, ancestors) {
@@ -179,8 +169,7 @@ function ctorName(name) {
   return name && /^[A-Z]/.test(name)
 }
 
-function inferFn(node, data, kind, name) {
-  if (kind) data.kind = kind
+function inferFn(node, data, name) {
   var inferredParams = node.params.map(inferParam)
 
   if (!data.type) {
@@ -195,15 +184,13 @@ function inferFn(node, data, kind, name) {
   if (node.generator) data.generator = true
 
   if (ctorName(name)) {
-    data.kind = "constructor"
-    return {constructor: data, kind: "class", loc: data.loc}
+    return {constructor: data, type: "class", loc: data.loc}
   } else {
     return data
   }
 }
 
 function inferClass(node, data) {
-  data.kind = "class"
   if (node.superClass && node.superClass.type == "Identifier") {
     var loc = node.superClass.loc
     loc.start.file = loc.source.name
@@ -212,19 +199,18 @@ function inferClass(node, data) {
   return data
 }
 
-function inferExpr(node, data, kind, name) {
-  if (kind) data.kind = kind
+function inferExpr(node, data, name) {
   if (!node) return data
   if (node.type == "ClassExpression")
     inferClass(node, data)
   else if (node.type == "FunctionExpression" || node.type == "ArrowFunctionExpression")
-    inferFn(node, data, "function", name)
+    inferFn(node, data, name)
   return data
 }
 
 // Deriving context from ancestor nodes
 
-function Pos (parent, name) { this.parent = parent; this.name = name }
+function Pos(parent, name) { this.parent = parent; this.name = name }
 
 function extend(from, to, path) {
   for (var prop in from) {
@@ -355,9 +341,6 @@ function posFromPath(items, path) {
       descend = "instanceProperties"
       i++
       next = path[i + 1]
-    } else if (next[0] == "#") {
-      descend = null
-      next = next.slice(1)
     }
     target = deref(target, name)
     if (descend) target = deref(target, descend)
@@ -366,12 +349,11 @@ function posFromPath(items, path) {
 }
 
 function splitPath(path) {
-  var m, parts = [], rest = path, pound = ""
-  while (rest && (m = /^(\[.*?\]|[^\s\.#]+)(\.|#)?/.exec(rest))) {
-    parts.push(pound + m[1])
+  var m, parts = [], rest = path
+  while (rest && (m = /^(\[.*?\]|[^\s\.#]+)(\.)?/.exec(rest))) {
+    parts.push(m[1])
     rest = rest.slice(m[0].length)
     if (!m[2]) break
-    pound = m[2] == "#" ? "#" : ""
   }
   if (rest) throw new Error("Invalid path: " + path)
   return parts

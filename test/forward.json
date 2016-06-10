@@ -1,12 +1,12 @@
 {
   "X": {
+    "type": "class",
     "loc": {
       "file": "test/forward.js",
       "line": 1,
       "column": 0
     },
     "description": "Class X",
-    "kind": "class",
     "instanceProperties": {
       "foo": {
         "type": "Function",
@@ -23,8 +23,7 @@
           "file": "test/forward.js",
           "line": 6,
           "column": 2
-        },
-        "kind": "method"
+        }
       }
     }
   }

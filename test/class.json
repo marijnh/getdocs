@@ -6,7 +6,7 @@
       "line": 1,
       "column": 0
     },
-    "kind": "class",
+    "type": "class",
     "instanceProperties": {
       "m": {
         "type": "Function",
@@ -42,8 +42,7 @@
           "file": "test/class.js",
           "line": 9,
           "column": 2
-        },
-        "kind": "method"
+        }
       }
     },
     "extends": {
@@ -60,25 +59,24 @@
         "line": 3,
         "column": 2
       },
-      "kind": "constructor",
       "type": "Function",
       "params": [
         {
-          "type": "any",
+          "type": "number",
           "name": "a",
           "loc": {
             "file": "test/class.js",
-            "line": 4,
-            "column": 14
+            "line": 3,
+            "column": 2
           }
         },
         {
-          "type": "any",
+          "type": "number",
           "name": "b",
           "loc": {
             "file": "test/class.js",
-            "line": 4,
-            "column": 17
+            "line": 3,
+            "column": 2
           }
         }
       ]
