@@ -22,13 +22,9 @@ exports.gather = function(text, filename, items) {
     if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
       throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
 
-    if (data.$forward) {
-      top.forward = splitPath(data.$forward)
-    } else {
-      var pos = findPos[top.type](top, stack)
-      if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)
-      pos.add(data)
-    }
+    var pos = findPos[top.type](top, stack)
+    if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)
+    pos.add(data)
   })
 
   // Mark locals exported with `export {a, b, c}` statements as exported
@@ -302,9 +298,6 @@ function findPrototype(items, ancestors) {
 
 function findSelf(items, ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
-    var forward = i && ancestors[i - 1].forward
-    if (forward) return posFromPath(items, forward).deref()
-
     var ancestor = ancestors[i], found
     if (ancestor.type == "ClassDeclaration")
       return deref(items, ancestor.id.name)
@@ -322,9 +315,6 @@ function findSelf(items, ancestors) {
 
 function findParent(items, ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
-    var forward = i && ancestors[i - 1].forward
-    if (forward) return posFromPath(items, forward).deref()
-
     var ancestor = ancestors[i]
     if (ancestor.type == "ClassDeclaration")
       return deref(items, ancestor.id.name)
