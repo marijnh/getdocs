@@ -50,7 +50,7 @@ exports.parse = function(text, filename) {
     sourceFile: {text: text, name: filename},
     sourceType: "module",
     onComment: function(block, text, start, end, startLoc, endLoc) {
-      if (/^\s*::/.test(text)) {
+      if (/^\s*[\w\.$]*::/.test(text)) {
         var obj = {text: text.split("\n"), start: start, end: end, startLoc: startLoc, endLoc: endLoc}
         found.push(obj)
         if (!block) current = obj
@@ -110,11 +110,9 @@ exports.findNodeAround = function(ast, pos, types) {
 }
 
 function parseComment(text, loc) {
-  var match = /^\s*::\s*/.exec(text)
-  var pos = match[0].length
-  var nameMatch = /^([\w\.$]+):/.exec(text.slice(pos))
-  var parsed = parseType(text, pos + (nameMatch ? nameMatch[0].length : 0), loc)
-  var data = parsed.type
+  var match = /^\s*([\w\.$]+)?::\s*/.exec(text)
+  var parsed = parseType(text, match[0].length, loc)
+  var data = parsed.type, name = match[1]
 
   text = text.slice(parsed.end)
   while (match = /^\s*#([\w$]+)(?:=([^"]\S*|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
@@ -124,5 +122,5 @@ function parseComment(text, loc) {
     data["$" + match[1]] = value
   }
   if (/\S/.test(text)) data.description = text
-  return {data: data, name: nameMatch && nameMatch[1]}
+  return {data: data, name: name}
 }

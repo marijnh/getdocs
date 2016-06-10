@@ -1,8 +1,8 @@
-// :: Abc: class
+// Abc:: class
 // The Abc class
 
-// :: Abc.prototype.m1: (a: number) → number
+// Abc.prototype.m1:: (a: number) → number
 // Method #1
 
-// :: myString: string
+// myString:: string
 // My string
