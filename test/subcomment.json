@@ -1,0 +1,42 @@
+{
+  "x": {
+    "loc": {
+      "line": 1,
+      "column": 0,
+      "file": "test/subcomment.js"
+    },
+    "type": "Object",
+    "description": "An object\n",
+    "properties": {
+      "x": {
+        "loc": {
+          "line": 4,
+          "column": 0,
+          "file": "test/subcomment.js"
+        },
+        "type": "number",
+        "description": "The x coordinate\n"
+      },
+      "y": {
+        "loc": {
+          "line": 7,
+          "column": 0,
+          "file": "test/subcomment.js"
+        },
+        "type": "Object",
+        "description": "The y object\n",
+        "properties": {
+          "inner": {
+            "loc": {
+              "line": 10,
+              "column": 0,
+              "file": "test/subcomment.js"
+            },
+            "type": "bool",
+            "description": "A property of `y`"
+          }
+        }
+      }
+    }
+  }
+}

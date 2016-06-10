@@ -9,22 +9,23 @@ exports.gather = function(text, filename, items) {
   var findPos = findPosFor(items)
 
   found.comments.forEach(function(comment) {
-    var data = comment.parsed.data
-    if (comment.parsed.subcomments.length) console.log(comment.parsed.subcomments)
+    var data = comment.parsed.data, pos
+
     if (comment.parsed.name) {
       var stack = docComments.findNodeAround(found.ast, comment.end, findPos)
-      posFromPath(findParent(items, stack) || items, splitPath(comment.parsed.name)).add(data)
-      return
+      pos = posFromPath(findParent(items, stack) || items, splitPath(comment.parsed.name))
+    } else {
+      var stack = docComments.findNodeAfter(found.ast, comment.end, findPos)
+      var top = stack && stack[stack.length - 1]
+      if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
+        throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
+
+      pos = findPos[top.type](top, stack)
+      if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)
     }
+    var stored = pos.add(data)
 
-    var stack = docComments.findNodeAfter(found.ast, comment.end, findPos)
-    var top = stack && stack[stack.length - 1]
-    if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
-      throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
-
-    var pos = findPos[top.type](top, stack)
-    if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)
-    pos.add(data)
+    comment.parsed.subcomments.forEach(sub => applySubComment(stored, sub))
   })
 
   // Mark locals exported with `export {a, b, c}` statements as exported
@@ -40,6 +41,29 @@ exports.gather = function(text, filename, items) {
   }
 
   return items
+}
+
+function applySubComment(parent, sub) {
+  var target
+  if (parent.type == "Function") {
+    if (sub.name == "return")
+      target = parent.returns
+    else if (parent.params) for (let i = 0; i < parent.params; i++)
+      if (parent.params[i].name == sub.name) target = parent.params[i]
+    if (!target) throw new SyntaxError("Unknown parameter " + sub.name + " referenced at " + sub.loc.file + ":" + sub.loc.line)
+  } else if (parent.type == "class" || parent.type == "interface" || parent.type == "Object") {
+    var path = splitPath(sub.name), target = parent
+    for (let i = 0; i < path.length; i++) {
+      if (path[i] == "prototype" && i < path.length - 1)
+        target = deref(deref(target, "instanceProperties"), path[++i])
+      else
+        target = deref(deref(target, "properties"), path[i])
+    }
+  } else {
+    throw new SyntaxError("Can not add sub-fields to named type " + parent.type + " at " + sub.loc.file + ":" + sub.loc.line)
+  }
+  var stored = extend(sub.data, target, sub.name)
+  sub.subcomments.forEach(sub => applySubComment(stored, sub))
 }
 
 function findPosFor(items) {
