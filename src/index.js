@@ -9,10 +9,11 @@ exports.gather = function(text, filename, items) {
   var findPos = findPosFor(items)
 
   found.comments.forEach(function(comment) {
-    var data = comment.data
-    if (comment.name) {
+    var data = comment.parsed.data
+    if (comment.parsed.subcomments.length) console.log(comment.parsed.subcomments)
+    if (comment.parsed.name) {
       var stack = docComments.findNodeAround(found.ast, comment.end, findPos)
-      posFromPath(findParent(items, stack) || items, splitPath(comment.name)).add(data)
+      posFromPath(findParent(items, stack) || items, splitPath(comment.parsed.name)).add(data)
       return
     }
 

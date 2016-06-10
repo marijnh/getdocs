@@ -16,6 +16,12 @@ function strip(lines) {
       }
     }
   }
+  if (head != null) {
+    var startIndent = /^\s*/.exec(lines[0])[0]
+    var trailing = /\s*$/.exec(head)[0]
+    var extra = trailing.length - startIndent.length
+    if (extra > 0) head = head.slice(0, head.length - extra)
+  }
 
   outer: for (var i = 0; i < lines.length; i++) {
     var line = lines[i].replace(/\s+$/, "")
@@ -50,14 +56,14 @@ exports.parse = function(text, filename) {
     sourceFile: {text: text, name: filename},
     sourceType: "module",
     onComment: function(block, text, start, end, startLoc, endLoc) {
-      if (/^\s*[\w\.$]*::/.test(text)) {
-        var obj = {text: text.split("\n"), start: start, end: end, startLoc: startLoc, endLoc: endLoc}
-        found.push(obj)
-        if (!block) current = obj
-      } else if (current && !block && current.endLoc.line == startLoc.line - 1) {
+      if (current && !block && current.endLoc.line == startLoc.line - 1) {
         current.text.push(text)
         current.end = end
         current.endLoc = endLoc
+      } else if (/^\s*[\w\.$]*::/.test(text)) {
+        var obj = {text: text.split("\n"), start: start, end: end, startLoc: startLoc, endLoc: endLoc}
+        found.push(obj)
+        if (!block) current = obj
       } else {
         current = null
       }
@@ -67,9 +73,7 @@ exports.parse = function(text, filename) {
   for (var i = 0; i < found.length; i++) {
     var comment = found[i], loc = comment.startLoc
     loc.file = filename
-    let parsed = parseComment(strip(comment.text), comment.startLoc)
-    comment.data = parsed.data
-    comment.name = parsed.name
+    comment.parsed = parseNestedComments(strip(comment.text), comment.startLoc)
   }
   return {ast: ast, comments: found}
 }
@@ -121,6 +125,35 @@ function parseComment(text, loc) {
     if (value.charAt(0) == '"') value = JSON.parse(value)
     data["$" + match[1]] = value
   }
+
   if (/\S/.test(text)) data.description = text
-  return {data: data, name: name}
+  return {data: data, name: name, subcomments: []}
+}
+
+function parseNestedComments(text, loc) {
+  var line = 0, context = [], top, nextIndent = /^\s*/.exec(text)[0].length
+  for (;;) {
+    var next = /\n( *)[\w\.$]*::/.exec(text)
+    var current = next ? text.slice(0, next.index) : text
+    var parsed = parseComment(current, line ? {line: loc.line + line, column: loc.column, file: loc.file} : loc)
+    if (!top) {
+      top = parsed
+    } else {
+      if (!parsed.name)
+        throw new SyntaxError("Sub-comment without name at " + loc.file + ":" + (loc.line + line))
+      while (context[context.length - 1].indent >= nextIndent) {
+        context.pop()
+        if (!context.length)
+          throw new SyntaxError("Invalid indentation for sub-field at " + loc.file + ":" + (loc.line + line))
+      }
+      context[context.length - 1].comment.subcomments.push(parsed)
+    }
+    context.push({indent: nextIndent, comment: parsed})
+
+    if (!next) break
+    line += current.split("\n").length + 1
+    text = text.slice(current.length + 1)
+    nextIndent = next[1].length
+  }
+  return top
 }
