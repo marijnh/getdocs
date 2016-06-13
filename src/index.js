@@ -47,9 +47,9 @@ function applySubComment(parent, sub) {
   if (parent.type == "Function") {
     if (sub.name == "return")
       target = parent.returns
-    else if (parent.params) for (var i = 0; i < parent.params; i++)
+    else if (parent.params) for (var i = 0; i < parent.params.length; i++)
       if (parent.params[i].name == sub.name) target = parent.params[i]
-    if (!target) raise("Unknown parameter " + sub.name, sub)
+    if (!target) raise("Unknown parameter " + sub.name, sub.data.loc)
   } else if (parent.type == "class" || parent.type == "interface" || parent.type == "Object") {
     var path = splitPath(sub.name), target = parent
     for (var i = 0; i < path.length; i++) {
@@ -57,9 +57,9 @@ function applySubComment(parent, sub) {
       target = deref(deref(target, isStatic ? "staticProperties" : "properties"), path[i])
     }
   } else {
-    raise("Can not add sub-fields to named type " + parent.type, sub)
+    raise("Can not add sub-fields to named type " + parent.type, sub.data.loc)
   }
-  var stored = extend(sub.data, target, sub.name)
+  var stored = extend(sub.data, target, [sub.name], true)
   sub.subcomments.forEach(function(sub) { applySubComment(stored, sub) })
 }
 
@@ -128,7 +128,7 @@ function addData(top, path, data) {
     }
     if (isCtor) {
       if (cur == "prototype") {
-        if (i == path.length - 1) raise("Can not annotate constructor prototype", data)
+        if (i == path.length - 1) raise("Can not annotate constructor prototype", data.loc)
         cur = path[++i]
       } else {
         descend = "staticProperties"
@@ -186,8 +186,8 @@ var inferForNode = {
   }
 }
 
-function raise(msg, node) {
-  throw new SyntaxError(msg + " at " + node.loc.source.name + ":" + node.loc.start.line)
+function raise(msg, loc) {
+  throw new SyntaxError(msg + " at " + (loc.file || loc.source.name) + ":" + (loc.start ? loc.start.line : loc.line))
 }
 
 function propName(node, force) {
@@ -200,7 +200,7 @@ function propName(node, force) {
   if (node.computed && key.type == "MemberExpression" &&
       !key.computed && key.object.name == "Symbol")
     return "[Symbol." + key.property.name + "]"
-  if (force) raise("Expected static property", node)
+  if (force) raise("Expected static property", node.loc)
 }
 
 function inferParam(n) {
@@ -277,9 +277,9 @@ function inferExpr(node, data, name) {
 
 // Deriving context from ancestor nodes
 
-function extend(from, to, path) {
+function extend(from, to, path, overrideLoc) {
   for (var prop in from) {
-    if (!(prop in to)) {
+    if (!(prop in to) || (prop == "loc" && overrideLoc)) {
       to[prop] = from[prop]
     } else if (prop == "properties" || prop == "staticProperties") {
       extend(from[prop], to[prop], path.concat(prop))
@@ -309,7 +309,7 @@ function lvalPath(lval, ancestors) {
   } else if (lval.type == "ThisExpression") {
     path = selfPath(ancestors.slice(0, ancestors.length - 1)).concat(path)
   } else {
-    raise("Could not derive a target for this assignment", lval)
+    raise("Could not derive a target for this assignment", lval.loc)
   }
   return path
 }
@@ -321,7 +321,7 @@ function assignedPath(ancestors) {
   else if (top.type == "AssignmentExpression")
     return lvalPath(top.left, ancestors)
   else
-    raise("Could not derive a name", top)
+    raise("Could not derive a name", top.loc)
 }
 
 function findPrototype(ancestors) {
@@ -353,7 +353,7 @@ function selfPath(ancestors) {
     else if (i && /Function/.test(ancestor.type) && (found = findPrototype(ancestors.slice(0, i))))
       return found
   }
-  raise("No context found for 'this'", ancestors[ancestors.length - 1])
+  raise("No context found for 'this'", ancestors[ancestors.length - 1].loc)
 }
 
 function parentPath(ancestors) {

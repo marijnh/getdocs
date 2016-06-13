@@ -1,0 +1,41 @@
+{
+  "foo": {
+    "loc": {
+      "line": 1,
+      "column": 0,
+      "file": "test/functionsub.js"
+    },
+    "type": "Function",
+    "params": [
+      {
+        "loc": {
+          "line": 5,
+          "column": 0,
+          "file": "test/functionsub.js"
+        },
+        "type": "number",
+        "name": "a",
+        "description": "Parameter a"
+      },
+      {
+        "loc": {
+          "line": 1,
+          "column": 0,
+          "file": "test/functionsub.js"
+        },
+        "type": "number",
+        "name": "b"
+      }
+    ],
+    "returns": {
+      "loc": {
+        "line": 7,
+        "column": 0,
+        "file": "test/functionsub.js"
+      },
+      "type": "number",
+      "description": "The return value is the sum"
+    },
+    "description": "A function\n"
+  }
+}
