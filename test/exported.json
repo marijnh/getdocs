@@ -1,5 +1,6 @@
 {
   "hello": {
+    "id": "hello",
     "type": "Function",
     "params": [],
     "returns": {
@@ -18,6 +19,7 @@
     "exported": true
   },
   "x": {
+    "id": "x",
     "type": "number",
     "loc": {
       "file": "test/exported.js",
@@ -27,6 +29,7 @@
     "exported": true
   },
   "default": {
+    "id": "default",
     "type": "string",
     "loc": {
       "file": "test/exported.js",

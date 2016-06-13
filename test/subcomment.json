@@ -1,5 +1,6 @@
 {
   "x": {
+    "id": "x",
     "loc": {
       "line": 1,
       "column": 0,
@@ -9,6 +10,7 @@
     "description": "An object\n",
     "properties": {
       "x": {
+        "id": "x.x",
         "loc": {
           "line": 4,
           "column": 0,
@@ -18,6 +20,7 @@
         "description": "The x coordinate\n"
       },
       "y": {
+        "id": "x.y",
         "loc": {
           "line": 7,
           "column": 0,
@@ -27,6 +30,7 @@
         "description": "The y object\n",
         "properties": {
           "inner": {
+            "id": "x.y.inner",
             "loc": {
               "line": 10,
               "column": 0,

@@ -1,5 +1,6 @@
 {
   "foo": {
+    "id": "foo",
     "loc": {
       "file": "test/tags.js",
       "line": 1,

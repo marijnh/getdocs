@@ -39,6 +39,8 @@ exports.gather = function(text, filename, items) {
     }
   }
 
+  assignIds(top)
+
   return items
 }
 
@@ -295,6 +297,14 @@ function extend(from, to, path, overrideLoc) {
 
 function deref(obj, name) {
   return obj[name] || (obj[name] = Object.create(null))
+}
+
+function assignIds(obj, path) {
+  if (path) obj.id = path
+  var base = path ? path + "." : ""
+  if (obj.constructor) obj.constructor.id = base + "constructor"
+  if (obj.properties) for (let prop in obj.properties) assignIds(obj.properties[prop], base + prop)
+  if (obj.staticProperties) for (let prop in obj.staticProperties) assignIds(obj.staticProperties[prop], base + "static_" + prop)
 }
 
 function lvalPath(lval, ancestors) {

@@ -1,6 +1,8 @@
 {
   "Point": {
+    "id": "Point",
     "constructor": {
+      "id": "Point.constructor",
       "type": "Function",
       "params": [
         {
@@ -37,6 +39,7 @@
     },
     "properties": {
       "x": {
+        "id": "Point.x",
         "type": "number",
         "loc": {
           "file": "test/class_ctor.js",
@@ -46,6 +49,7 @@
         "description": "The x coordinate"
       },
       "y": {
+        "id": "Point.y",
         "type": "number",
         "loc": {
           "file": "test/class_ctor.js",

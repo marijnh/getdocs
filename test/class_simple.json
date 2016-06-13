@@ -1,5 +1,6 @@
 {
   "Foo": {
+    "id": "Foo",
     "description": "The Foo class",
     "loc": {
       "file": "test/class_simple.js",
@@ -9,6 +10,7 @@
     "type": "class",
     "properties": {
       "m": {
+        "id": "Foo.m",
         "type": "Function",
         "params": [
           {
@@ -54,6 +56,7 @@
       }
     },
     "constructor": {
+      "id": "Foo.constructor",
       "loc": {
         "file": "test/class_simple.js",
         "line": 3,

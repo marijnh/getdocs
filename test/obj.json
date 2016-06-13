@@ -1,8 +1,10 @@
 {
   "obj": {
+    "id": "obj",
     "type": "Object",
     "properties": {
       "extra": {
+        "id": "obj.extra",
         "type": "number",
         "loc": {
           "file": "test/obj.js",
@@ -11,6 +13,7 @@
         }
       },
       "foo": {
+        "id": "obj.foo",
         "description": "A property",
         "type": "number",
         "loc": {
@@ -20,6 +23,7 @@
         }
       },
       "baz": {
+        "id": "obj.baz",
         "description": "An added property",
         "type": "number",
         "loc": {

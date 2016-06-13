@@ -1,5 +1,6 @@
 {
   "bar": {
+    "id": "bar",
     "type": "Function",
     "params": [
       {

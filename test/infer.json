@@ -1,5 +1,6 @@
 {
   "x": {
+    "id": "x",
     "loc": {
       "line": 1,
       "column": 0,
@@ -9,6 +10,7 @@
     "type": "number"
   },
   "y": {
+    "id": "y",
     "loc": {
       "line": 4,
       "column": 0,
@@ -18,6 +20,7 @@
     "type": "bool"
   },
   "z": {
+    "id": "z",
     "loc": {
       "line": 7,
       "column": 0,
@@ -27,6 +30,7 @@
     "type": "RegExp"
   },
   "obj": {
+    "id": "obj",
     "loc": {
       "line": 10,
       "column": 0,

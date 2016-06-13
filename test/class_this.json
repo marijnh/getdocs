@@ -1,5 +1,6 @@
 {
   "Foo": {
+    "id": "Foo",
     "loc": {
       "file": "test/class_this.js",
       "line": 1,
@@ -8,6 +9,7 @@
     "description": "A Foo",
     "type": "class",
     "constructor": {
+      "id": "Foo.constructor",
       "type": "Function",
       "params": [
         {
@@ -28,6 +30,7 @@
     },
     "properties": {
       "a": {
+        "id": "Foo.a",
         "type": "number",
         "loc": {
           "file": "test/class_this.js",
@@ -37,6 +40,7 @@
         "description": "The a property"
       },
       "b": {
+        "id": "Foo.b",
         "type": "bool",
         "loc": {
           "file": "test/class_this.js",
@@ -46,6 +50,7 @@
         "description": "The b property"
       },
       "doStuff": {
+        "id": "Foo.doStuff",
         "type": "Function",
         "params": [],
         "loc": {

@@ -1,5 +1,6 @@
 {
   "blah": {
+    "id": "blah",
     "type": "Function",
     "params": [
       {

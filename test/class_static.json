@@ -1,5 +1,6 @@
 {
   "Foo": {
+    "id": "Foo",
     "description": "The Foo class",
     "type": "class",
     "loc": {
@@ -17,6 +18,7 @@
     },
     "staticProperties": {
       "m": {
+        "id": "Foo.static_m",
         "type": "Function",
         "params": [
           {

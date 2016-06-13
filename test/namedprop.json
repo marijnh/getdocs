@@ -1,5 +1,6 @@
 {
   "Boo": {
+    "id": "Boo",
     "loc": {
       "line": 1,
       "column": 0,
@@ -9,6 +10,7 @@
     "description": "Boo the class",
     "properties": {
       "someProp": {
+        "id": "Boo.someProp",
         "loc": {
           "line": 3,
           "column": 2,

@@ -1,5 +1,6 @@
 {
   "Abc": {
+    "id": "Abc",
     "loc": {
       "line": 1,
       "column": 0,
@@ -9,6 +10,7 @@
     "type": "class",
     "properties": {
       "m1": {
+        "id": "Abc.m1",
         "loc": {
           "line": 4,
           "column": 0,
@@ -39,6 +41,7 @@
     },
     "staticProperties": {
       "m2": {
+        "id": "Abc.static_m2",
         "loc": {
           "line": 7,
           "column": 0,
@@ -52,6 +55,7 @@
     }
   },
   "myString": {
+    "id": "myString",
     "loc": {
       "line": 10,
       "column": 0,

@@ -1,5 +1,6 @@
 {
   "Foo": {
+    "id": "Foo",
     "description": "The Foo class",
     "type": "class",
     "loc": {
@@ -9,6 +10,7 @@
     },
     "properties": {
       "m": {
+        "id": "Foo.m",
         "type": "Function",
         "params": [
           {
