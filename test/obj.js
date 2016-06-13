@@ -5,5 +5,5 @@ let obj = {
   bar: 20
 }
 
-// :: number An added property
+// ::- An added property
 obj.baz = 30

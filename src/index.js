@@ -156,9 +156,8 @@ var inferForNode = {
     return inferFn(node, data, node.id.name)
   },
 
-  ClassDeclaration: function(node, data) {
-    return inferClass(node, data)
-  },
+  ClassDeclaration: inferClass,
+  ClassExpression: inferClass,
 
   AssignmentExpression: function(node, data) {
     return inferExpr(node.right, data, propName(node.left))
@@ -256,15 +255,25 @@ function inferClass(node, data) {
     loc.start.file = loc.source.name
     data.extends = parseType(node.superClass.name, 0, loc.start).type
   }
+  if (!data.type) data.type = "class"
   return data
 }
 
 function inferExpr(node, data, name) {
   if (!node) return data
-  if (node.type == "ClassExpression")
+  if (node.type == "ClassExpression") {
     inferClass(node, data)
-  else if (node.type == "FunctionExpression" || node.type == "ArrowFunctionExpression")
+  } else if (node.type == "FunctionExpression" || node.type == "ArrowFunctionExpression") {
     inferFn(node, data, name)
+  } else if (node.type == "Literal" && !data.type) {
+    if (typeof node.value == "number") data.type = "number"
+    else if (typeof node.value == "boolean") data.type = "bool"
+    else if (typeof node.value == "string") data.type = "string"
+    else if (node.value instanceof RegExp) data.type = "RegExp"
+  } else if (node.type == "NewExpression" && !data.type) {
+    if (node.callee.type == "Identifier" && ctorName(node.callee.name))
+      data.type = node.callee.name
+  }
   return data
 }
 

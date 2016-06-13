@@ -1,4 +1,4 @@
-// :: class A Foo
+// ::- A Foo
 class Foo {
   // :: (number)
   constructor(a) {

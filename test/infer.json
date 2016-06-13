@@ -1,0 +1,38 @@
+{
+  "x": {
+    "loc": {
+      "line": 1,
+      "column": 0,
+      "file": "test/infer.js"
+    },
+    "description": "It's x",
+    "type": "number"
+  },
+  "y": {
+    "loc": {
+      "line": 4,
+      "column": 0,
+      "file": "test/infer.js"
+    },
+    "description": "It's y",
+    "type": "bool"
+  },
+  "z": {
+    "loc": {
+      "line": 7,
+      "column": 0,
+      "file": "test/infer.js"
+    },
+    "description": "It's z",
+    "type": "RegExp"
+  },
+  "obj": {
+    "loc": {
+      "line": 10,
+      "column": 0,
+      "file": "test/infer.js"
+    },
+    "description": "It's obj",
+    "type": "Something"
+  }
+}

@@ -114,11 +114,17 @@ exports.findNodeAround = function(ast, pos, types) {
 }
 
 function parseComment(text, loc) {
-  var match = /^\s*([\w\.$]+)?::\s*/.exec(text)
-  var parsed = parseType(text, match[0].length, loc)
-  var data = parsed.type, name = match[1]
+  var match = /^\s*([\w\.$]+)?::\s*(-\s*)?/.exec(text), data, end = match[0].length, name = match[1]
+  if (match[2]) {
+    data = Object.create(null)
+    data.loc = loc
+  } else {
+    var parsed = parseType(text, match[0].length, loc)
+    data = parsed.type
+    end = parsed.end
+  }
 
-  text = text.slice(parsed.end)
+  text = text.slice(end)
   while (match = /^\s*#([\w$]+)(?:=([^"]\S*|"(?:[^"\\]|\\.)*"))?\s*/.exec(text)) {
     text = text.slice(match[0].length)
     var value = match[2] || "true"

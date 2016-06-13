@@ -1,4 +1,4 @@
-// :: class The Foo class
+// ::- The Foo class
 class Foo extends Bar {
   // :: (number, number)
   constructor(a, b) {
