@@ -53,10 +53,8 @@ function applySubComment(parent, sub) {
   } else if (parent.type == "class" || parent.type == "interface" || parent.type == "Object") {
     var path = splitPath(sub.name), target = parent
     for (var i = 0; i < path.length; i++) {
-      if (path[i] == "prototype" && i < path.length - 1)
-        target = deref(deref(target, "instanceProperties"), path[++i])
-      else
-        target = deref(deref(target, "properties"), path[i])
+      var isStatic = i == path.length - 1 && sub.data.$static
+      target = deref(deref(target, isStatic ? "staticProperties" : "properties"), path[i])
     }
   } else {
     raise("Can not add sub-fields to named type " + parent.type, sub)
