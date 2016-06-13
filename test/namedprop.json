@@ -7,24 +7,26 @@
     },
     "type": "class",
     "description": "Boo the class",
-    "someProp": {
-      "loc": {
-        "line": 3,
-        "column": 2,
-        "file": "test/namedprop.js"
-      },
-      "type": "Function",
-      "params": [
-        {
-          "loc": {
-            "line": 3,
-            "column": 2,
-            "file": "test/namedprop.js"
-          },
-          "type": "number"
-        }
-      ],
-      "description": "Some prop"
+    "properties": {
+      "someProp": {
+        "loc": {
+          "line": 3,
+          "column": 2,
+          "file": "test/namedprop.js"
+        },
+        "type": "Function",
+        "params": [
+          {
+            "loc": {
+              "line": 3,
+              "column": 2,
+              "file": "test/namedprop.js"
+            },
+            "type": "number"
+          }
+        ],
+        "description": "Some prop"
+      }
     }
   }
 }

@@ -15,7 +15,7 @@
         "file": "test/class_static.js"
       }
     },
-    "properties": {
+    "staticProperties": {
       "m": {
         "type": "Function",
         "params": [

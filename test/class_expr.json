@@ -7,7 +7,7 @@
       "line": 1,
       "column": 0
     },
-    "instanceProperties": {
+    "properties": {
       "m": {
         "type": "Function",
         "params": [

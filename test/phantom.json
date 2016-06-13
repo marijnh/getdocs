@@ -7,7 +7,7 @@
     },
     "description": "The Abc class",
     "type": "class",
-    "instanceProperties": {
+    "properties": {
       "m1": {
         "loc": {
           "line": 4,
@@ -36,11 +36,24 @@
         },
         "description": "Method #1"
       }
+    },
+    "staticProperties": {
+      "m2": {
+        "loc": {
+          "line": 7,
+          "column": 0,
+          "file": "test/phantom.js"
+        },
+        "type": "Function",
+        "params": [],
+        "$static": "true",
+        "description": "Method #2"
+      }
     }
   },
   "myString": {
     "loc": {
-      "line": 7,
+      "line": 10,
       "column": 0,
       "file": "test/phantom.js"
     },

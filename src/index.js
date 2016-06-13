@@ -3,29 +3,28 @@ var parseType = require("./parsetype")
 
 exports.gather = function(text, filename, items) {
   if (!items) items = Object.create(null)
+  var top = {properties: items}
 
   var found = docComments.parse(text, filename)
 
-  var findPos = findPosFor(items)
-
   found.comments.forEach(function(comment) {
-    var data = comment.parsed.data, pos
+    var data = comment.parsed.data
 
     if (comment.parsed.name) {
-      var stack = docComments.findNodeAround(found.ast, comment.end, findPos)
-      pos = posFromPath(findParent(items, stack) || items, splitPath(comment.parsed.name))
+      var stack = docComments.findNodeAround(found.ast, comment.end, findPath)
+      path = addNameToPath(comment.parsed.name, getPath(stack), data.$static)
     } else {
-      var stack = docComments.findNodeAfter(found.ast, comment.end, findPos)
-      var top = stack && stack[stack.length - 1]
-      if (!top || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(top.end, comment.start)))
+      var stack = docComments.findNodeAfter(found.ast, comment.end, findPath)
+      var node = stack && stack[stack.length - 1]
+      if (!node || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(node.end, comment.start)))
         throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
-
-      pos = findPos[top.type](top, stack)
-      if (inferForNode.hasOwnProperty(top.type)) data = inferForNode[top.type](top, data, stack)
+      if (inferForNode.hasOwnProperty(node.type)) data = inferForNode[node.type](node, data, stack)
+      var path = getPath(stack)
     }
-    var stored = pos.add(data)
 
-    comment.parsed.subcomments.forEach(sub => applySubComment(stored, sub))
+    var stored = addData(top, path, data)
+
+    comment.parsed.subcomments.forEach(function(sub) { applySubComment(stored, sub) })
   })
 
   // Mark locals exported with `export {a, b, c}` statements as exported
@@ -48,59 +47,99 @@ function applySubComment(parent, sub) {
   if (parent.type == "Function") {
     if (sub.name == "return")
       target = parent.returns
-    else if (parent.params) for (let i = 0; i < parent.params; i++)
+    else if (parent.params) for (var i = 0; i < parent.params; i++)
       if (parent.params[i].name == sub.name) target = parent.params[i]
-    if (!target) throw new SyntaxError("Unknown parameter " + sub.name + " referenced at " + sub.loc.file + ":" + sub.loc.line)
+    if (!target) raise("Unknown parameter " + sub.name, sub)
   } else if (parent.type == "class" || parent.type == "interface" || parent.type == "Object") {
     var path = splitPath(sub.name), target = parent
-    for (let i = 0; i < path.length; i++) {
+    for (var i = 0; i < path.length; i++) {
       if (path[i] == "prototype" && i < path.length - 1)
         target = deref(deref(target, "instanceProperties"), path[++i])
       else
         target = deref(deref(target, "properties"), path[i])
     }
   } else {
-    throw new SyntaxError("Can not add sub-fields to named type " + parent.type + " at " + sub.loc.file + ":" + sub.loc.line)
+    raise("Can not add sub-fields to named type " + parent.type, sub)
   }
   var stored = extend(sub.data, target, sub.name)
-  sub.subcomments.forEach(sub => applySubComment(stored, sub))
+  sub.subcomments.forEach(function(sub) { applySubComment(stored, sub) })
 }
 
-function findPosFor(items) {
-  return {
-    // FIXME destructuring
-    VariableDeclaration: function(node) { return new Pos(items, node.declarations[0].id.name) },
+function getPath(ancestors) {
+  var top = ancestors[ancestors.length - 1]
+  return top ? findPath[top.type](top, ancestors) : []
+}
 
-    VariableDeclarator: function(node) { return new Pos(items, node.id.name) },
+var findPath = {
+  // FIXME destructuring
+  VariableDeclaration: function(node) { return [node.declarations[0].id.name] },
 
-    FunctionDeclaration: function(node) { return new Pos(items, node.id.name) },
+  VariableDeclarator: function(node) { return [node.id.name] },
 
-    ClassDeclaration: function(node) { return new Pos(items, node.id.name) },
+  FunctionDeclaration: function(node) { return [node.id.name] },
 
-    AssignmentExpression: function(node, ancestors) {
-      return lvalPos(items, node.left, ancestors)
-    },
+  ClassDeclaration: function(node) { return [node.id.name] },
 
-    Property: function(node, ancestors) {
-      return new Pos(deref(findParent(items, ancestors), "properties"), propName(node, true))
-    },
+  AssignmentExpression: function(node, ancestors) {
+    return lvalPath(node.left, ancestors)
+  },
 
-    MethodDefinition: function(node, ancestors) {
-      var parent = findParent(items, ancestors)
-      if (node.kind == "constructor")
-        return new Pos(parent, "constructor")
-      else
-        return new Pos(deref(parent, node.static ? "properties" : "instanceProperties"), propName(node, true))
-    },
+  Property: function(node, ancestors) {
+    var path = parentPath(ancestors)
+    path.push(propName(node, true))
+    return path
+  },
 
-    ExportNamedDeclaration: function(node, ancestors) {
-      return this[node.declaration.type](node.declaration, ancestors)
-    },
-
-    ExportDefaultDeclaration: function() {
-      return new Pos(items, "default")
+  MethodDefinition: function(node, ancestors) {
+    var path = parentPath(ancestors)
+    if (node.kind == "constructor") {
+      path.push("#constructor")
+    } else {
+      if (!node.static) path.push("prototype")
+      path.push(propName(node, true))
     }
+    return path
+  },
+
+  ExportNamedDeclaration: function(node, ancestors) {
+    return this[node.declaration.type](node.declaration, ancestors)
+  },
+
+  ExportDefaultDeclaration: function() {
+    return ["default"]
   }
+}
+
+function addNameToPath(name, path, isStatic) {
+  var parts = splitPath(name)
+  for (var i = 0; i < parts.length; i++) {
+    if (path.length && ctorName(path[path.length - 1]) && (!isStatic || i < parts.length - 1))
+      path.push("prototype")
+    path.push(parts[i])
+  }
+  return path
+}
+
+function addData(top, path, data) {
+  var target = top, isCtor = false
+  for (var i = 0; i < path.length; i++) {
+    var cur = path[i], descend = "properties"
+    if (cur == "#constructor") {
+      target = deref(target, "constructor")
+      break
+    }
+    if (isCtor) {
+      if (cur == "prototype") {
+        if (i == path.length - 1) raise("Can not annotate constructor prototype", data)
+        cur = path[++i]
+      } else {
+        descend = "staticProperties"
+      }
+    }
+    target = deref(deref(target, descend), cur)
+    isCtor = target.type ? target.type == "class" : ctorName(cur)
+  }
+  return extend(data, target, path)
 }
 
 var inferForNode = {
@@ -109,7 +148,7 @@ var inferForNode = {
     return inferExpr(decl0.init, data, decl0.id.name)
   },
 
-  VariableDeclarator: function(node, data, ancestors) {
+  VariableDeclarator: function(node, data) {
     return inferExpr(node.init, data, node.id.name)
   },
 
@@ -231,16 +270,14 @@ function inferExpr(node, data, name) {
 
 // Deriving context from ancestor nodes
 
-function Pos(parent, name) { this.parent = parent; this.name = name }
-
 function extend(from, to, path) {
   for (var prop in from) {
     if (!(prop in to)) {
       to[prop] = from[prop]
-    } else if (prop == "properties" || prop == "instanceProperties") {
-      extend(from[prop], to[prop], path + "." + prop)
+    } else if (prop == "properties" || prop == "staticProperties") {
+      extend(from[prop], to[prop], path.concat(prop))
     } else {
-      var msg = "Conflicting information for " + path + "." + prop
+      var msg = "Conflicting information for " + path.join(".") + "." + prop
       if (to.loc) msg += " at " + to.loc.file + ":" + to.loc.line
       if (from.loc) msg += (to.loc ? " and " : " at ") + from.loc.file + ":" + from.loc.line
       throw new SyntaxError(msg)
@@ -249,57 +286,45 @@ function extend(from, to, path) {
   return to
 }
 
-Pos.prototype.add = function(data) {
-  var known = this.parent[this.name]
-  return known ? extend(data, known, this.name) : this.parent[this.name] = data
-}
-
-Pos.prototype.deref = function() {
-  return this.parent[this.name] || (this.parent[this.name] = Object.create(null))
-}
-
 function deref(obj, name) {
   return obj[name] || (obj[name] = Object.create(null))
 }
 
-function lvalPos(items, lval, ancestors) {
-  var path = [], target, name, inst = false
+function lvalPath(lval, ancestors) {
+  var path = []
   while (lval.type == "MemberExpression") {
-    path.push(propName(lval))
+    path.unshift(propName(lval))
     lval = lval.object
   }
 
   if (lval.type == "Identifier") {
-    if (!path.length) return new Pos(items, lval.name)
-    target = deref(items, lval.name)
+    path.unshift(lval.name)
   } else if (lval.type == "ThisExpression") {
-    target = findSelf(items, ancestors.slice(0, ancestors.length - 1))
-    inst = true
+    path = selfPath(ancestors.slice(0, ancestors.length - 1)).concat(path)
   } else {
     raise("Could not derive a target for this assignment", lval)
   }
-
-  for (var i = path.length - 1; i >= 0; i--) {
-    var name = path[i], descend = inst ? "instanceProperties" : "properties"
-    if (name == "prototype" && i) {
-      name = path[--i]
-      descend = "instanceProperties"
-    }
-    target = deref(target, descend)
-    if (i) target = deref(target, name)
-    inst = false
-  }
-  return new Pos(target, path[0])
+  return path
 }
 
-function findAssigned(items, ancestors) {
+function assignedPath(ancestors) {
   var top = ancestors[ancestors.length - 1]
   if (top.type == "VariableDeclarator" && top.id.type == "Identifier")
-    return deref(items, top.id.name)
+    return [top.id.name]
   else if (top.type == "AssignmentExpression")
-    return lvalPos(items, top.left, ancestors).deref()
+    return lvalPath(top.left, ancestors)
   else
     raise("Could not derive a name", top)
+}
+
+function findPrototype(ancestors) {
+  var assign = ancestors[ancestors.length - 1]
+  if (assign.type != "AssignmentExpression") return null
+  var lval = assign.left
+  if (lval.type == "MemberExpression" && !lval.computed &&
+      lval.object.type == "MemberExpression" && !lval.object.computed &&
+      lval.object.property.name == "prototype")
+    return lvalPath(lval.object, ancestors)
 }
 
 function assignedName(node) {
@@ -309,58 +334,29 @@ function assignedName(node) {
     return propName(node.left)
 }
 
-function findPrototype(items, ancestors) {
-  var assign = ancestors[ancestors.length - 1]
-  if (assign.type != "AssignmentExpression") return null
-  for (var i = 0, lval = assign.left; i < 2; i++) {
-    if (lval.type != "MemberExpression" || lval.computed) return null
-    if (lval.property.name == "prototype")
-      return lvalPos(items, lval.object, ancestors).deref()
-    lval = lval.object
-  }
-}
-
-function findSelf(items, ancestors) {
+function selfPath(ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
     var ancestor = ancestors[i], found
-    if (ancestor.type == "ClassDeclaration")
-      return deref(items, ancestor.id.name)
-    else if (ancestor.type == "FunctionDeclaration" && ctorName(ancestor.id.name))
-      return deref(items, ancestor.id.name)
+    if (ancestor.type == "ClassDeclaration" ||
+        (ancestor.type == "FunctionDeclaration" && ctorName(ancestor.id.name)))
+      return [ancestor.id.name, "prototype"]
     else if (i && (ancestor.type == "ClassExpression" ||
                    ancestor.type == "FunctionExpression" && ctorName(assignedName(ancestors[i - 1]))))
-      return findAssigned(items, ancestors.slice(0, i))
-    else if (i && /Function/.test(ancestor.type) &&
-             (found = findPrototype(items, ancestors.slice(0, i))))
+      return assignedPath(ancestors.slice(0, i)).concat("prototype")
+    else if (i && /Function/.test(ancestor.type) && (found = findPrototype(ancestors.slice(0, i))))
       return found
   }
   raise("No context found for 'this'", ancestors[ancestors.length - 1])
 }
 
-function findParent(items, ancestors) {
+function parentPath(ancestors) {
   for (var i = ancestors.length - 1; i >= 0; i--) {
     var ancestor = ancestors[i]
     if (ancestor.type == "ClassDeclaration")
-      return deref(items, ancestor.id.name)
+      return [ancestor.id.name]
     else if (i && (ancestor.type == "ClassExpression" || ancestor.type == "ObjectExpression"))
-      return findAssigned(items, ancestors.slice(0, i))
+      return assignedPath(ancestors.slice(0, i))
   }
-}
-
-function posFromPath(items, path) {
-  var target = items, next = path[0]
-  for (var i = 0; i < path.length - 1; i++) {
-    var name = next, descend = "properties"
-    next = path[i + 1]
-    if (i < path.length - 2 && next == "prototype") {
-      descend = "instanceProperties"
-      i++
-      next = path[i + 1]
-    }
-    target = deref(target, name)
-    if (descend) target = deref(target, descend)
-  }
-  return new Pos(target, next)
 }
 
 function splitPath(path) {

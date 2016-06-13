@@ -2,12 +2,12 @@
   "Foo": {
     "description": "The Foo class",
     "loc": {
-      "file": "test/class.js",
+      "file": "test/class_simple.js",
       "line": 1,
       "column": 0
     },
     "type": "class",
-    "instanceProperties": {
+    "properties": {
       "m": {
         "type": "Function",
         "params": [
@@ -15,7 +15,7 @@
             "type": "number",
             "name": "a",
             "loc": {
-              "file": "test/class.js",
+              "file": "test/class_simple.js",
               "line": 9,
               "column": 2
             }
@@ -24,7 +24,7 @@
             "type": "string",
             "name": "b",
             "loc": {
-              "file": "test/class.js",
+              "file": "test/class_simple.js",
               "line": 9,
               "column": 2
             }
@@ -33,13 +33,13 @@
         "returns": {
           "type": "bool",
           "loc": {
-            "file": "test/class.js",
+            "file": "test/class_simple.js",
             "line": 9,
             "column": 2
           }
         },
         "loc": {
-          "file": "test/class.js",
+          "file": "test/class_simple.js",
           "line": 9,
           "column": 2
         }
@@ -50,12 +50,12 @@
       "loc": {
         "line": 2,
         "column": 18,
-        "file": "test/class.js"
+        "file": "test/class_simple.js"
       }
     },
     "constructor": {
       "loc": {
-        "file": "test/class.js",
+        "file": "test/class_simple.js",
         "line": 3,
         "column": 2
       },
@@ -65,7 +65,7 @@
           "type": "number",
           "name": "a",
           "loc": {
-            "file": "test/class.js",
+            "file": "test/class_simple.js",
             "line": 3,
             "column": 2
           }
@@ -74,7 +74,7 @@
           "type": "number",
           "name": "b",
           "loc": {
-            "file": "test/class.js",
+            "file": "test/class_simple.js",
             "line": 3,
             "column": 2
           }
