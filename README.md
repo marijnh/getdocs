@@ -34,22 +34,23 @@ You can say `getdocs foo.js` to get this JSON:
     ],
     "returns": { "type": "number" },
     "description": "Add two numbers",
-    "kind": "function",
     "exported": true
   }
 }
 ```
 
-The idea is to then feed this into a system that massages it into
-actual HTML or Markdown or whatever documentation files.
+The idea is to then feed this into a system (can be a simple set of
+templates) that massages it into actual human-readable documention
+files.
 
-A getdocs doc comment starts at either a type declarations (a comment
-line starting with `::`) or a start marker `;;`. It can be either a
-block comment or a sequence of line comments.
+A getdocs doc comment starts with a double colon, optionally prefixed
+with a name (`foo::`). It can be either a block comment or a
+continuous sequence of line comments.
 
-Such a doc comment applies to the next program element after it. That
-element should be something with a name, like a variable, function, or
-class declaration, or an assignment that can be statically resolved.
+When no name is given, such a doc comment applies to the next program
+element after it. That element should be something with a name, like a
+variable, function, or class declaration, or an assignment that can be
+statically resolved.
 
 The documented items found in the files passed to getdocs will be
 returned as part of a big JSON object. Nesting is only applied for
@@ -57,14 +58,35 @@ class and object properties, where the properties are moved under the
 `properties` object of the item they are part of. _A single namespace
 is assumed for the documented identifiers in the group of files._
 
+Inside a doc comment, properties of the thing being defined can be
+added by writing nested, indented doc comments. For example:
+
+```
+// Plugin:: interface
+//
+// Objects conforming to the plugin interface can be plugged into a
+// Foo
+//
+//   mount:: (Foo) → bool
+//   Mount the plugin in this Foo. The return value indicates whether
+//   the mount succeeded.
+//
+//   unmount:: (Foo)
+//   Unmount the plugin from a Foo.
+```
+
+Further nesting below such a property (by adding more indentation) is
+supported.
+
 ## Type syntax
 
 A type can be:
 
  * A JavaScript identifier, optionally followed by any number of
    properties, which are a dot character followed by a JavaScript
-   identifier. A type name can be followed by a list of content types,
-   between angle brackets, as in `Object<string>`.
+   identifier. A type name can be followed by a list of type
+   parameters, between angle brackets, as in `Object<string>` (an
+   object whose properties hold string values).
 
  * An array type, which is a type wrapped in `[` and `]`. `[x]` is
    equivalent to `Array<x>`.
@@ -82,9 +104,9 @@ A type can be:
 
  * An object type, written as a list of properties wrapped in `{` and
    `}` braces. Each property must start with an identifier, followed
-   by a comma, followed by a type.
+   by a colon, followed by a type.
 
- * A string literal, enclosed by double quotes.
+ * A string literal, enclosed by double quotes, or a number literal.
 
 Here are some examples of types:
 
@@ -98,14 +120,16 @@ Here are some examples of types:
 
  * An array of strings: `[string]`
 
- * An array of `CommandSpec`s or the string "schema": `union<[CommandSpec], "schema">`
+ * An array of numbers or a string: `union<[number], string>` (what
+   the name `union` means isn't something getdocs is aware of, but
+   you could use it for union types, and maybe render it as `[number]
+   | string` in your output).
 
 ## Tags
 
 It is possible to add tags to a documented item. These are words
 prefixed with a `#` character, appearing at the start of the comment —
-that is, immediately after the `;;` for a type-less comment, or
-immediately after the type for a typed one.
+that is, immediately after the type.
 
 A tag like `#deprecated`, for example, will result in a `$deprecated:
 "true"` property on the given item. The property is named by
@@ -116,26 +140,9 @@ You can give tags an explicit value other than `"true"` by writing an
 without whitespace) or a quoted JavaScript-style string. For example
 `#chapter=selection` or `#added="2.1.0"`.
 
-These tags have a special meaning that is interpreted by getdocs:
-
- * **path**: Prevents the comment from being associated with the
-   program element after it, and puts it in the namespace under the
-   given path instead, which should be something like `name` or
-   `Foo.prototype.methodName`. You can also separate elements with a
-   `#` to indicate a direct property (rather than going through
-   `.properties`) in the output—for example `Foo#constructor` to set
-   the constructor property of a class.
-
- * **kind**: Explicitly sets the kind of this item. Does not get a
-   dollar sign prefix.
-
- * **forward**: Can be used to make the properties or methods of a
-   class or object appear in another class or object. A typical use
-   case is moving documentation from a private subclass into a public
-   abstract class. A tag like `#forward=Foo` will cause the properties
-   of the annotated thing to appear in the documentation for the thing
-   named `Foo` instead. Note that other information included in the
-   doc comments that has the `forward` tag will be ignored.
+The `#static` tag can be used to indicate that a given class member is
+static (which is only necessary for doc comments that aren't tied to a
+syntactic element in the code).
 
 ## Output JSON
 
@@ -145,22 +152,18 @@ item:
 
  * **description**: The doc comment for the item.
 
- * **kind**: The kind of program element that is documented. May be
-   `function`, `var`, `let`, `const`, `class`, `constructor`,
-   `method`, `getter`, or `setter`.
-
  * **loc**: A `{line, column, file}` object pointing at the start of the item.
 
- * **exported**: Set if the item is exported.
+ * **exported**: Set if the item is exported using ES6 module syntax.
 
  * **constructor**: For classes with a documented constructor, this
    points at the constructor function.
 
- * **extends**: Only applies for classes. Holds the name of the
+ * **extends**: Only applies for classes. Holds the type of the
    superclass.
 
- * **instanceProperties**: For classes, this holds properties and
-   methods that appear on instances (and on the prototype).
+ * **staticProperties**: For classes, this holds properties and
+   methods that appear directly on the constructor.
 
 In addition, they may have these properties, which can also appear on
 nested types:
@@ -168,8 +171,10 @@ nested types:
  * **type**: The name of the type. Instances of classes should use the
    (capitalized) class name. Builtin types will have names like
    `Array` or `Function`. Getdocs does not prescribe a naming of
-   builtin types, but for consistency I recommend you use `number`,
+   primitive types, but for consistency I recommend you use `number`,
    `string`, and `bool`.
+
+ * **properties**: An object mapping property names to types.
 
  * **params**: For function types, this holds an array of parameter
    types. Parameter types can have these additional properties:
@@ -178,14 +183,13 @@ nested types:
 
      * **rest**: Set when this is a rest parameter.
 
-     * **default**: The default value of the parameter.
+     * **default**: The default value of the parameter (as a raw
+       source string).
 
  * **returns**: For function types, this holds the type that is
    returned.
 
- * **properties**: An object mapping property names to types.
-
- * **content**: For array types or named types with content (angle
-   brackets) specification, this holds an array of content types.
+ * **typeParams**: For array types or named types with parameters
+   (angle bracket syntax), this holds an array of parameter types.
 
  * **optional**: Set for nullable types.

@@ -74,10 +74,10 @@ function parse(input) {
       type.returns = parse(input)
   } else if (input.eat("[")) {
     type.type = "Array"
-    type.content = [parse(input)]
+    type.typeParams = [parse(input)]
     while (!input.eat("]")) {
       if (!input.eat(",")) input.error("Missing comma or closing square bracket")
-      type.content.push(parse(input))
+      type.typeParams.push(parse(input))
     }
   } else if (input.eat("{")) {
     type.type = "Object"
@@ -93,10 +93,10 @@ function parse(input) {
     if (!name) input.error("Unexpected syntax: " + input.str.slice(input.pos, input.pos + 5))
     type.type = name[0]
     if (input.eat("<")) {
-      type.content = []
+      type.typeParams = []
       while (!input.eat(">")) {
-        if (type.content.length && !input.eat(",")) input.error("Missing comma or closing angle bracket")
-        type.content.push(parse(input))
+        if (type.typeParams.length && !input.eat(",")) input.error("Missing comma or closing angle bracket")
+        type.typeParams.push(parse(input))
       }
     }
   }

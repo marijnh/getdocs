@@ -5,7 +5,7 @@
     "params": [
       {
         "type": "Array",
-        "content": [{
+        "typeParams": [{
           "type": "string",
           "loc": {
             "file": "test/restarg.js",
