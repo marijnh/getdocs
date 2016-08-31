@@ -193,3 +193,7 @@ nested types:
    (angle bracket syntax), this holds an array of parameter types.
 
  * **optional**: Set for nullable types.
+
+ * **id**: The path to this type. For a top-level variable `foo`
+   this'll be `"foo"`, for the type of the property `bar` under `foo`,
+   it'll be `"foo.bar"`, and so on.
