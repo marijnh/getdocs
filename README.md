@@ -44,8 +44,11 @@ templates) that massages it into actual human-readable documention
 files.
 
 A getdocs doc comment starts with a double colon, optionally prefixed
-with a name (`foo::`). It can be either a block comment or a
-continuous sequence of line comments.
+with a name (`foo::`) and followed by a type. It can be either a block
+comment or a continuous sequence of line comments. When you don't want
+to specify a type, for example because the type can be inferred from
+the code (as with a class declaration), you can write a single dash
+after the colons, instead of a type.
 
 When no name is given, such a doc comment applies to the next program
 element after it. That element should be something with a name, like a
