@@ -18,7 +18,7 @@
     },
     "staticProperties": {
       "m": {
-        "id": "Foo.static_m",
+        "id": "Foo^m",
         "type": "Function",
         "params": [
           {

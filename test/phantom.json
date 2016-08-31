@@ -41,7 +41,7 @@
     },
     "staticProperties": {
       "m2": {
-        "id": "Abc.static_m2",
+        "id": "Abc^m2",
         "loc": {
           "line": 7,
           "column": 0,

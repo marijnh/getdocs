@@ -304,7 +304,7 @@ function assignIds(obj, path) {
   var base = path ? path + "." : ""
   if (Object.prototype.hasOwnProperty.call(obj, "constructor")) assignIds(obj.constructor, base + "constructor")
   if (obj.properties) for (var prop in obj.properties) assignIds(obj.properties[prop], base + prop)
-  if (obj.staticProperties) for (var prop in obj.staticProperties) assignIds(obj.staticProperties[prop], base + "static_" + prop)
+  if (obj.staticProperties) for (var prop in obj.staticProperties) assignIds(obj.staticProperties[prop], path + "^" + prop)
 }
 
 function lvalPath(lval, ancestors) {
