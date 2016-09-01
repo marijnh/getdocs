@@ -200,3 +200,19 @@ nested types:
  * **id**: The path to this type. For a top-level variable `foo`
    this'll be `"foo"`, for the type of the property `bar` under `foo`,
    it'll be `"foo.bar"`, and so on.
+
+## Interface
+
+The module exports the following function:
+
+**`gather`**`: (code: string, options: Object) → Object`
+
+It takes a code file, extracts the docs, and returns an object
+describing the documented items.
+
+Options can have the following properties:
+
+ * **`filename`**`: string` The filename of the given code. Required.
+
+ * **`items`**`: ?Object` An existing items object to add the items
+   found in the given code to.

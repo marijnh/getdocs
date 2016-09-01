@@ -6,7 +6,7 @@ var items = {}
 
 process.argv.slice(2).forEach(function(arg) {
   glob.sync(arg).forEach(function(filename) {
-    getdocs.gather(fs.readFileSync(filename, "utf8"), filename, items)
+    getdocs.gather(fs.readFileSync(filename, "utf8"), {filename: filename, items: items})
   })
 })
 

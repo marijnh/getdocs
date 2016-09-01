@@ -1,11 +1,11 @@
 var docComments = require("./doccomments")
 var parseType = require("./parsetype")
 
-exports.gather = function(text, filename, items) {
-  if (!items) items = Object.create(null)
+exports.gather = function(text, options) {
+  let items = options.items || Object.create(null)
   var top = {properties: items}
 
-  var found = docComments.parse(text, filename)
+  var found = docComments.parse(text, options)
 
   found.comments.forEach(function(comment) {
     var data = comment.parsed.data
@@ -17,7 +17,7 @@ exports.gather = function(text, filename, items) {
       var stack = docComments.findNodeAfter(found.ast, comment.end, findPath)
       var node = stack && stack[stack.length - 1]
       if (!node || !/^(?:[;{},\s]|\/\/.*|\/\*.*?\*\/)*$/.test(text.slice(node.end, comment.start)))
-        throw new SyntaxError("Misplaced documentation block at " + filename + ":" + comment.startLoc.line)
+        throw new SyntaxError("Misplaced documentation block at " + options.filename + ":" + comment.startLoc.line)
       if (inferForNode.hasOwnProperty(node.type)) data = inferForNode[node.type](node, data, stack)
       var path = getPath(stack)
     }

@@ -47,8 +47,8 @@ function strip(lines) {
   return lines.join("\n")
 }
 
-exports.parse = function(text, filename) {
-  var current = null, found = []
+exports.parse = function(text, options) {
+  var current = null, found = [], filename = options.filename
 
   var ast = acorn.parse(text, {
     ecmaVersion: 6,
