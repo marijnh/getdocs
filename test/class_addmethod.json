@@ -16,6 +16,7 @@
           {
             "type": "number",
             "name": "a",
+            "id": "Foo.bar^a",
             "loc": {
               "file": "test/class_addmethod.js",
               "line": 4,
@@ -25,6 +26,7 @@
           {
             "type": "string",
             "name": "b",
+            "id": "Foo.bar^b",
             "loc": {
               "file": "test/class_addmethod.js",
               "line": 4,
@@ -34,6 +36,7 @@
         ],
         "returns": {
           "type": "bool",
+          "id": "Foo.bar^returns",
           "loc": {
             "file": "test/class_addmethod.js",
             "line": 4,

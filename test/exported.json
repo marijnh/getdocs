@@ -5,6 +5,7 @@
     "params": [],
     "returns": {
       "type": "string",
+      "id": "hello^returns",
       "loc": {
         "file": "test/exported.js",
         "line": 1,

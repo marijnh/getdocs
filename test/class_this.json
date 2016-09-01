@@ -15,6 +15,7 @@
         {
           "type": "number",
           "name": "a",
+          "id": "Foo.constructor^a",
           "loc": {
             "file": "test/class_this.js",
             "line": 3,

@@ -33,7 +33,8 @@
             "type": "\"b\""
           }
         ],
-        "name": "which"
+        "name": "which",
+        "id": "add^which"
       },
       {
         "loc": {
@@ -42,7 +43,8 @@
           "file": "test/literal.js"
         },
         "type": "number",
-        "name": "a"
+        "name": "a",
+        "id": "add^a"
       },
       {
         "loc": {
@@ -51,7 +53,8 @@
           "file": "test/literal.js"
         },
         "type": "number",
-        "name": "b"
+        "name": "b",
+        "id": "add^b"
       }
     ],
     "returns": {
@@ -60,7 +63,8 @@
         "column": 0,
         "file": "test/literal.js"
       },
-      "type": "number"
+      "type": "number",
+      "id": "add^returns"
     },
     "description": "Returns a or b"
   }

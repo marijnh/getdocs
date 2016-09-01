@@ -25,7 +25,8 @@
               "file": "test/phantom.js"
             },
             "type": "number",
-            "name": "a"
+            "name": "a",
+            "id": "Abc.m1^a"
           }
         ],
         "returns": {
@@ -34,7 +35,8 @@
             "column": 0,
             "file": "test/phantom.js"
           },
-          "type": "number"
+          "type": "number",
+          "id": "Abc.m1^returns"
         },
         "description": "Method #1"
       }

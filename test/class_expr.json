@@ -16,6 +16,7 @@
           {
             "type": "number",
             "name": "a",
+            "id": "Foo.m^a",
             "loc": {
               "file": "test/class_expr.js",
               "line": 3,
@@ -25,6 +26,7 @@
           {
             "type": "string",
             "name": "b",
+            "id": "Foo.m^b",
             "loc": {
               "file": "test/class_expr.js",
               "line": 3,
@@ -34,6 +36,7 @@
         ],
         "returns": {
           "type": "bool",
+          "id": "Foo.m^returns",
           "loc": {
             "file": "test/class_expr.js",
             "line": 3,

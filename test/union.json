@@ -24,6 +24,7 @@
           }
         ],
         "name": "x",
+        "id": "blah^x",
         "loc": {
           "file": "test/union.js",
           "line": 1,
@@ -68,6 +69,7 @@
         ],
         "optional": true,
         "name": "y",
+        "id": "blah^y",
         "loc": {
           "file": "test/union.js",
           "line": 1,
@@ -77,6 +79,7 @@
     ],
     "returns": {
       "type": "union",
+      "id": "blah^returns",
       "typeParams": [
         {
           "type": "number",

@@ -8,6 +8,7 @@
         {
           "type": "number",
           "name": "x",
+          "id": "Point.constructor^x",
           "loc": {
             "file": "test/class_ctor.js",
             "line": 1,
@@ -17,6 +18,7 @@
         {
           "type": "number",
           "name": "y",
+          "id": "Point.constructor^y",
           "loc": {
             "file": "test/class_ctor.js",
             "line": 1,

@@ -8,6 +8,7 @@
         "default": "false",
         "optional": true,
         "name": "arg",
+        "id": "foo^arg",
         "loc": {
           "file": "test/defaultarg.js",
           "line": 1,

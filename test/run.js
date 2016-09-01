@@ -10,7 +10,7 @@ fs.readdirSync(__dirname).forEach(function(filename) {
 
   var expected = JSON.parse(fs.readFileSync(__dirname + "/" + filename, "utf8"))
   var jsfile = "/" + isJSON[1] + ".js"
-  var returned = getdocs.gather(fs.readFileSync(__dirname + jsfile, "utf8"), "test" + jsfile)
+  var returned = getdocs.gather(fs.readFileSync(__dirname + jsfile, "utf8"), {filename: "test" + jsfile})
   try {
     compare(returned, expected, "")
   } catch(e) {

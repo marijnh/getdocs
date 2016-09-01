@@ -301,10 +301,15 @@ function deref(obj, name) {
 
 function assignIds(obj, path) {
   if (path) obj.id = path
-  var base = path ? path + "." : ""
-  if (Object.prototype.hasOwnProperty.call(obj, "constructor")) assignIds(obj.constructor, base + "constructor")
-  if (obj.properties) for (var prop in obj.properties) assignIds(obj.properties[prop], base + prop)
-  if (obj.staticProperties) for (var prop in obj.staticProperties) assignIds(obj.staticProperties[prop], path + "^" + prop)
+  if (Object.prototype.hasOwnProperty.call(obj, "constructor"))
+    assignIds(obj.constructor, path + ".constructor")
+  if (obj.properties) for (var prop in obj.properties)
+    assignIds(obj.properties[prop], (path ? path + "." : "") + prop)
+  if (obj.staticProperties) for (var prop in obj.staticProperties)
+    assignIds(obj.staticProperties[prop], path + "^" + prop)
+  if (obj.params) for (var i = 0; i < obj.params.length; i++)
+    if (obj.params[i].name) assignIds(obj.params[i], path + "^" + obj.params[i].name)
+  if (obj.returns) assignIds(obj.returns, path + "^returns")
 }
 
 function lvalPath(lval, ancestors) {

@@ -5,6 +5,7 @@
     "params": [
       {
         "name": "foo",
+        "id": "x^foo",
         "type": "number",
         "loc": {
           "file": "test/diffargname.js",
@@ -14,6 +15,7 @@
       },
       {
         "name": "bar",
+        "id": "x^bar",
         "type": "string",
         "loc": {
           "file": "test/diffargname.js",

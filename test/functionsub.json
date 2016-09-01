@@ -16,6 +16,7 @@
         },
         "type": "number",
         "name": "a",
+        "id": "foo^a",
         "description": "Parameter a"
       },
       {
@@ -25,7 +26,8 @@
           "file": "test/functionsub.js"
         },
         "type": "number",
-        "name": "b"
+        "name": "b",
+        "id": "foo^b"
       }
     ],
     "returns": {
@@ -35,6 +37,7 @@
         "file": "test/functionsub.js"
       },
       "type": "number",
+      "id": "foo^returns",
       "description": "The return value is the sum"
     },
     "description": "A function\n"

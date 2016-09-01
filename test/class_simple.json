@@ -16,6 +16,7 @@
           {
             "type": "number",
             "name": "a",
+            "id": "Foo.m^a",
             "loc": {
               "file": "test/class_simple.js",
               "line": 9,
@@ -25,6 +26,7 @@
           {
             "type": "string",
             "name": "b",
+            "id": "Foo.m^b",
             "loc": {
               "file": "test/class_simple.js",
               "line": 9,
@@ -34,6 +36,7 @@
         ],
         "returns": {
           "type": "bool",
+          "id": "Foo.m^returns",
           "loc": {
             "file": "test/class_simple.js",
             "line": 9,
@@ -67,6 +70,7 @@
         {
           "type": "number",
           "name": "a",
+          "id": "Foo.constructor^a",
           "loc": {
             "file": "test/class_simple.js",
             "line": 3,
@@ -76,6 +80,7 @@
         {
           "type": "number",
           "name": "b",
+          "id": "Foo.constructor^b",
           "loc": {
             "file": "test/class_simple.js",
             "line": 3,

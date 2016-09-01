@@ -6,6 +6,7 @@
       {
         "type": "number",
         "name": "a",
+        "id": "add^a",
         "loc": {
           "file": "test/function.js",
           "line": 1,
@@ -15,6 +16,7 @@
       {
         "type": "number",
         "name": "b",
+        "id": "add^b",
         "loc": {
           "file": "test/function.js",
           "line": 1,
@@ -24,6 +26,7 @@
     ],
     "returns": {
       "type": "number",
+      "id": "add^returns",
       "loc": {
         "file": "test/function.js",
         "line": 1,
