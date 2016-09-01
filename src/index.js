@@ -1,5 +1,6 @@
 var docComments = require("./doccomments")
-var parseType = require("./parsetype")
+exports.stripComment = docComments.stripComment
+var parseType = exports.parseType = require("./parsetype")
 
 exports.gather = function(text, options) {
   let items = options.items || Object.create(null)

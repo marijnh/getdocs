@@ -216,3 +216,20 @@ Options can have the following properties:
 
  * **`items`**`: ?Object` An existing items object to add the items
    found in the given code to.
+
+ * **`onComment`**`: ?(block: bool, text: string, start: number, end:
+   number, startPos: Object, endPos: Object)` Will be called for each
+   comment in the code, if given.
+
+**`parseType`**`: (input: string, start: number, loc: {file: string, line: number}) → {type: Object, end: number}`
+
+Parse a type in getdocs syntax into its object representation. `start`
+indicates where in the string the parsing should start. The returned
+object tells you where the type ended.
+
+Will throw a `SyntaxError` when the type isn't valid.
+
+**`stripComment`**`: (comment: string) → string`
+
+Strips leading indentation and asterisks (as in the common block
+comment style where each line gets an asterisk) from a string.

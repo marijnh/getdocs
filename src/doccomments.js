@@ -47,6 +47,8 @@ function strip(lines) {
   return lines.join("\n")
 }
 
+exports.stripComment = function(text) { return strip(text.split("\n")) }
+
 exports.parse = function(text, options) {
   var current = null, found = [], filename = options.filename
 
@@ -67,6 +69,7 @@ exports.parse = function(text, options) {
       } else {
         current = null
       }
+      if (options.onComment) options.onComment(block, text, start, end, startLoc, endLoc)
     }
   })
 
