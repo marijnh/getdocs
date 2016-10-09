@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var fs = require("fs")
 var glob = require("glob")
 var getdocs = require("../src")
