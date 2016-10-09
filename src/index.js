@@ -3,7 +3,7 @@ exports.stripComment = docComments.stripComment
 var parseType = exports.parseType = require("./parsetype")
 
 exports.gather = function(text, options) {
-  let items = options.items || Object.create(null)
+  var items = options.items || Object.create(null)
   var top = {properties: items}
 
   var found = docComments.parse(text, options)
