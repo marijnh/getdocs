@@ -111,6 +111,9 @@ A type can be:
 
  * A string literal, enclosed by double quotes, or a number literal.
 
+ * A type followed by `extends` followed by another type, to indicate
+   a sub-type.
+
 Here are some examples of types:
 
  * `Math.pow`: `(base: number, exponent: number) → number`
@@ -162,8 +165,8 @@ item:
  * **constructor**: For classes with a documented constructor, this
    points at the constructor function.
 
- * **extends**: Only applies for classes. Holds the type of the
-   superclass.
+ * **extends**: Holds the type of the supertype of a class or other
+     sub-type.
 
  * **staticProperties**: For classes, this holds properties and
    methods that appear directly on the constructor.

@@ -48,6 +48,12 @@ Input.prototype = {
 }
 
 function parse(input) {
+  var base = parseBase(input)
+  if (input.match(/^extends\b/)) base.extends = parse(input)
+  return base
+}
+
+function parseBase(input) {
   if (input.eat("?")) {
     var inner = parse(input)
     inner.optional = true
