@@ -139,12 +139,22 @@ function parseComment(text, loc) {
   return {data: data, name: name, subcomments: []}
 }
 
+function dropIndent(text) {
+  var lines = text.split("\n"), indent = 1e7
+  for (var i = 0; i < lines.length; i++)
+    if (/\S/.test(lines[i]))
+      indent = Math.min(indent, /^\s*/.exec(lines[i])[0].length)
+  if (indent == 0) return text
+  for (var i = 0; i < lines.length; i++) lines[i] = lines[i].slice(indent)
+  return lines.join("\n")
+}
+
 function parseNestedComments(text, loc) {
   var line = 0, context = [], top, nextIndent = /^\s*/.exec(text)[0].length
   for (;;) {
     var next = /\n( *)[\w\.$]*::/.exec(text)
     var current = next ? text.slice(0, next.index) : text
-    var parsed = parseComment(current, line ? {line: loc.line + line, column: loc.column, file: loc.file} : loc)
+    var parsed = parseComment(dropIndent(current), line ? {line: loc.line + line, column: loc.column, file: loc.file} : loc)
     if (!top) {
       top = parsed
     } else {
